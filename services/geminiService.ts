@@ -1,4 +1,4 @@
-import { GoogleGenerativeAI } from "@google/genai";
+import { GoogleGenAI } from "@google/genai";
 import { SYSTEM_PROMPT } from '../constants';
 import { RawScenario } from '../types';
 
@@ -11,7 +11,7 @@ if (!apiKey) {
 }
 
 // 3. Inicializa la IA una sola vez. No puede ser null.
-const ai = new GoogleGenerativeAI({ apiKey });
+const ai = new GoogleGenAI({ apiKey });
 
 export async function generateTestScenarios(userStory: string): Promise<RawScenario[]> {
   const fullPrompt = `

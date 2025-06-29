@@ -15,7 +15,7 @@ if (!apiKey) {
 }
 
 // 3. Inicializa la IA pasándole la clave directamente.
-const ai = new GoogleGenerativeAI(apiKey);
+const ai = new GoogleGenAI(apiKey);
 
 export async function generateTestScenarios(userStory: string): Promise<RawScenario[]> {
   // If the API key is still the placeholder, it means it's not configured for local dev,

@@ -1,4 +1,4 @@
-import { GoogleGenerativeAI } from "@google/genai";
+import { GoogleGenAI } from "@google/genai";
 import { SYSTEM_PROMPT } from '../constants';
 import { RawScenario } from '../types';
 
@@ -14,7 +14,7 @@ if (!apiKey) {
 }
 
 // 3. Inicializa la IA pasándole la clave directamente. Se hace UNA SOLA VEZ.
-const ai = new GoogleGenerativeAI(apiKey);
+const ai = new GoogleGenAI(apiKey);
 
 export async function generateTestScenarios(userStory: string): Promise<RawScenario[]> {
   // If the API key is still the placeholder, it means it's not configured for local dev,

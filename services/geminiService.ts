@@ -1,4 +1,4 @@
-import { GoogleGenerativeAI } from "@google/generative-ai";
+import { GoogleGenerativeAI } from "@google/genai";
 import { SYSTEM_PROMPT } from '../constants';
 import { RawScenario } from '../types';
 

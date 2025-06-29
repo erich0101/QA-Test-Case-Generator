@@ -5,7 +5,7 @@ import { localApiKey } from './localApiKey';
 
 const localApiKeyPlaceholder = "PASTE_YOUR_GEMINI_API_KEY_HERE";
 // Vercel's build command (`sed`) will replace this placeholder with the actual key from environment variables.
-const prodApiKeyPlaceholder = import.meta.env.VITE_GEMINI_API_KEY;;
+const prodApiKeyPlaceholder = import.meta.env.VITE_GEMINI_API_KEY;
 
 let apiKey: string = prodApiKeyPlaceholder; // Default to the placeholder
 

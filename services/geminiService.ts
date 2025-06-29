@@ -11,8 +11,7 @@ if (!apiKey) {
 }
 
 // 3. Inicializa la IA una sola vez. No puede ser null.
-const ai = new GoogleGenAI({ apiKey });
-
+const ai = new GoogleGenAI(apiKey);
 export async function generateTestScenarios(userStory: string): Promise<RawScenario[]> {
   const fullPrompt = `
     ${SYSTEM_PROMPT}

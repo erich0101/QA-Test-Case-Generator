@@ -7,7 +7,7 @@
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview",
-    "vercel-build": "esbuild index.tsx --bundle --outfile=dist/bundle.js --loader:.tsx=tsx && cp index.html dist/ && sed -i 's|/index.tsx|/bundle.js|' dist/index.html && sed -i \"s|__GEMINI_API_KEY__|${API_KEY}|g\" dist/bundle.js"
+    "vercel-build": "esbuild index.tsx --bundle --outfile=dist/bundle.js --loader:.tsx=tsx && cp index.html dist/ && sed -i 's|/index.tsx|/bundle.js|' dist/index.html && sed -i \"s|VITE_GEMINI_API_KEY|${API_KEY}|g\" dist/bundle.js"
   },
   "dependencies": {
     "react": "^19.1.0",

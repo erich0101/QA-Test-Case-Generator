@@ -7,7 +7,7 @@
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview",
-    "vercel-build": "mkdir dist && cp -r components services index.html index.tsx App.tsx types.ts constants.ts metadata.json package.json dist/ && rm -f dist/services/localApiKey.ts && sed -i \"s|__GEMINI_API_KEY__|${API_KEY}|g\" dist/services/geminiService.ts"
+    "vercel-build": "esbuild index.tsx --bundle --outfile=dist/bundle.js --loader:.tsx=tsx && cp index.html dist/ && sed -i 's|/index.tsx|/bundle.js|' dist/index.html && sed -i \"s|__GEMINI_API_KEY__|${API_KEY}|g\" dist/bundle.js"
   },
   "dependencies": {
     "react": "^19.1.0",
@@ -18,5 +18,6 @@
     "@types/node": "^22.14.0",
     "typescript": "~5.7.2",
     "vite": "^6.2.0"
+    "esbuild": "^0.23.0"
   }
 }

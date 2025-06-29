@@ -25,7 +25,7 @@ export async function generateTestScenarios(userStory: string): Promise<RawScena
   }
 
   // Correct initialization as per Google GenAI SDK guidelines
-  const ai = new GoogleGenAI({ apiKey });
+  const ai = new GoogleGenAI(apiKey);
 
   const fullPrompt = `
     ${SYSTEM_PROMPT}

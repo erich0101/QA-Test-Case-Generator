@@ -1,0 +1,5 @@
+{
+  "name": "QA & Testing Test Case Generator",
+  "description": "An AI-powered assistant for QA and Software Testing. Input a user story or functional requirements, and the app will generate comprehensive test scenarios using Gherkin syntax, complete with interactive acceptance criteria.",
+  "requestFramePermissions": []
+}

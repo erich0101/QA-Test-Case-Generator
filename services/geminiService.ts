@@ -1,10 +1,9 @@
-import { GoogleGenAI } from "@google/genai";
+import { GoogleGenerativeAI } from "@google/genai";
 import { SYSTEM_PROMPT } from '../constants';
 import { RawScenario } from '../types';
-import { localApiKey } from './localApiKey';
 
-const localApiKeyPlaceholder = "PASTE_YOUR_GEMINI_API_KEY_HERE";
-// Vercel's build command (`sed`) will replace this placeholder with the actual key from environment variables.
+// 1. Lee la variable de entorno usando el método estándar de Vite.
+//    Esto funciona TANTO en local (con .env) COMO en Vercel (con Environment Variables).
 const apiKey = import.meta.env.VITE_GEMINI_API_KEY;
 
 // 2. Comprueba si la clave existe. Si no, lanza un error claro.
@@ -14,8 +13,8 @@ if (!apiKey) {
   );
 }
 
-// 3. Inicializa la IA pasándole la clave directamente.
-const ai = new GoogleGenAI(apiKey);
+// 3. Inicializa la IA pasándole la clave directamente. Se hace UNA SOLA VEZ.
+const ai = new GoogleGenerativeAI(apiKey);
 
 export async function generateTestScenarios(userStory: string): Promise<RawScenario[]> {
   // If the API key is still the placeholder, it means it's not configured for local dev,

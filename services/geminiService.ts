@@ -17,14 +17,8 @@ if (!apiKey) {
 const ai = new GoogleGenAI(apiKey);
 
 export async function generateTestScenarios(userStory: string): Promise<RawScenario[]> {
-  // If the API key is still the placeholder, it means it's not configured for local dev,
-  // or the production build script failed to replace it.
-  if (apiKey === prodApiKeyPlaceholder) {
-    throw new Error("API key not configured. For local development, add your key to 'services/localApiKey.ts'. For production, ensure the API_KEY environment variable is set in Vercel and the build command is correct.");
-  }
-
-  // Correct initialization as per Google GenAI SDK guidelines
-  const ai = new GoogleGenAI(apiKey);
+  // NO hay ninguna lógica de placeholders aquí. No es necesaria.
+  // NO se vuelve a declarar `ai`. Ya existe.
 
   const fullPrompt = `
     ${SYSTEM_PROMPT}
@@ -51,28 +45,22 @@ export async function generateTestScenarios(userStory: string): Promise<RawScena
     \`\`\`
   `;
 
- try {
-    const response = await ai.models.generateContent({
-      model: 'gemini-2.5-flash-lite-preview-06-17',
-      contents: fullPrompt,
-      config: {
+  try {
+    // 3. Usa el método correcto y actual del SDK para obtener el modelo.
+    const model = ai.getGenerativeModel({ model: 'gemini-2.5-flash-lite-preview-06-17' });
+    const result = await model.generateContent({
+      contents: [{ role: "user", parts: [{ text: fullPrompt }] }],
+      generationConfig: {
         responseMimeType: 'application/json',
         temperature: 0.2,
       },
     });
-
-    // Directly use response.text which is the recommended way.
-    let jsonStr = response.text;
-
+    
+    const response = result.response;
+    const jsonStr = response.text();
+    
     if (!jsonStr) {
       throw new Error('La respuesta de la API estaba vacía.');
-    }
-
-    // Clean up potential markdown code fences
-    const fenceRegex = /^```(\w*)?\s*\n?(.*?)\n?\s*```$/s;
-    const match = jsonStr.match(fenceRegex);
-    if (match && match[2]) {
-      jsonStr = match[2].trim();
     }
 
     const parsedData = JSON.parse(jsonStr);

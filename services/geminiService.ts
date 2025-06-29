@@ -1,18 +1,29 @@
 import { GoogleGenAI } from "@google/genai";
 import { SYSTEM_PROMPT } from '../constants';
 import { RawScenario } from '../types';
+import { localApiKey } from './localApiKey';
 
-// 1. Lee la variable de entorno usando el método de Vite.
-const apiKey = import.meta.env.VITE_GEMINI_API_KEY;
+const localApiKeyPlaceholder = "PASTE_YOUR_GEMINI_API_KEY_HERE";
+// Vercel's build command (`sed`) will replace this placeholder with the actual key from environment variables.
+const prodApiKeyPlaceholder = "VITE_GEMINI_API_KEY";
 
-// 2. Comprueba si la clave existe. Si no, lanza un error claro.
-if (!apiKey) {
-  throw new Error("Configuración de API Key faltante. Asegúrate de que VITE_GEMINI_API_KEY esté definida en tu archivo .env (para local) o en las Environment Variables de Vercel (para producción).");
+let apiKey: string = prodApiKeyPlaceholder; // Default to the placeholder
+
+// For local development, if the user has provided a key in `localApiKey.ts`, use it.
+if (localApiKey && localApiKey !== localApiKeyPlaceholder) {
+  apiKey = localApiKey;
 }
 
-// 3. Inicializa la IA una sola vez. No puede ser null.
-const ai = new GoogleGenAI(apiKey);
 export async function generateTestScenarios(userStory: string): Promise<RawScenario[]> {
+  // If the API key is still the placeholder, it means it's not configured for local dev,
+  // or the production build script failed to replace it.
+  if (apiKey === prodApiKeyPlaceholder) {
+    throw new Error("API key not configured. For local development, add your key to 'services/localApiKey.ts'. For production, ensure the API_KEY environment variable is set in Vercel and the build command is correct.");
+  }
+
+  // Correct initialization as per Google GenAI SDK guidelines
+  const ai = new GoogleGenAI({ apiKey });
+
   const fullPrompt = `
     ${SYSTEM_PROMPT}
 

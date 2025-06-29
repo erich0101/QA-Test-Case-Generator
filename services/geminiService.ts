@@ -5,14 +5,17 @@ import { localApiKey } from './localApiKey';
 
 const localApiKeyPlaceholder = "PASTE_YOUR_GEMINI_API_KEY_HERE";
 // Vercel's build command (`sed`) will replace this placeholder with the actual key from environment variables.
-const prodApiKeyPlaceholder = import.meta.env.VITE_GEMINI_API_KEY;
+const apiKey = import.meta.env.VITE_GEMINI_API_KEY;
 
-let apiKey: string = prodApiKeyPlaceholder; // Default to the placeholder
-
-// For local development, if the user has provided a key in `localApiKey.ts`, use it.
-if (localApiKey && localApiKey !== localApiKeyPlaceholder) {
-  apiKey = localApiKey;
+// 2. Comprueba si la clave existe. Si no, lanza un error claro.
+if (!apiKey) {
+  throw new Error(
+    "Configuración de API Key faltante. Asegúrate de que VITE_GEMINI_API_KEY esté definida en tu archivo .env (para local) o en las Environment Variables de Vercel (para producción)."
+  );
 }
+
+// 3. Inicializa la IA pasándole la clave directamente.
+const ai = new GoogleGenerativeAI(apiKey);
 
 export async function generateTestScenarios(userStory: string): Promise<RawScenario[]> {
   // If the API key is still the placeholder, it means it's not configured for local dev,

@@ -38,18 +38,30 @@ export async function generateTestScenarios(userStory: string): Promise<RawScena
     \`\`\`
   `;
 
-  try {
-    const model = ai.getGenerativeModel({ model: 'gemini-1.5-flash-latest' }); // Usar un modelo estable
-    const result = await model.generateContent({
-      contents: [{ role: "user", parts: [{ text: fullPrompt }] }],
-      generationConfig: {
+ try {
+    const response = await ai.models.generateContent({
+      model: 'gemini-2.5-flash-lite-preview-06-17',
+      contents: fullPrompt,
+      config: {
         responseMimeType: 'application/json',
         temperature: 0.2,
       },
     });
-    
-    const response = result.response;
-    const jsonStr = response.text();
+
+    // Directly use response.text which is the recommended way.
+    let jsonStr = response.text;
+
+    if (!jsonStr) {
+      throw new Error('La respuesta de la API estaba vacía.');
+    }
+
+    // Clean up potential markdown code fences
+    const fenceRegex = /^```(\w*)?\s*\n?(.*?)\n?\s*```$/s;
+    const match = jsonStr.match(fenceRegex);
+    if (match && match[2]) {
+      jsonStr = match[2].trim();
+    }
+
     const parsedData = JSON.parse(jsonStr);
 
     if (!Array.isArray(parsedData)) {

@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build",
-    "preview": "vite preview"
+    "preview": "vite preview",
     "vercel-build": "sed -i \"s|__GEMINI_API_KEY__|${API_KEY}|g\" services/geminiService.ts"
   },
   "dependencies": {

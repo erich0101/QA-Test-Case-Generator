@@ -1,4 +1,3 @@
-
 import React, { useState, useCallback, useEffect } from 'react';
 import { RawScenario, ScenarioResult } from './types';
 import { generateTestScenarios } from './services/geminiService';
@@ -66,7 +65,7 @@ function App() {
           <div className="flex items-center justify-center gap-4 mb-2">
             <SparklesIcon className="w-10 h-10 text-brand-primary" />
             <h1 className="text-3xl sm:text-4xl font-bold text-slate-100">
-              QA Test Case Generator
+              QA Test Case Generator By Erich Petrocelli
             </h1>
           </div>
           <p className="text-slate-400">

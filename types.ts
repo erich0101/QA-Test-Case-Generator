@@ -11,3 +11,8 @@ export interface ScenarioResult {
   gherkin: string;
   criteria: string[];
 }
+
+export interface ImageAttachment {
+  mimeType: string;
+  data: string; // base64 encoded string
+}

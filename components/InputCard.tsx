@@ -1,6 +1,9 @@
 
-import React from 'react';
+import React, { useRef, useCallback } from 'react';
 import { SparklesIcon } from './icons/SparklesIcon';
+import { PaperclipIcon } from './icons/PaperclipIcon';
+import { XCircleIcon } from './icons/XCircleIcon';
+import { ImageAttachment } from '../types';
 
 interface InputCardProps {
   userInput: string;
@@ -8,28 +11,94 @@ interface InputCardProps {
   onGenerate: () => void;
   isLoading: boolean;
   apiKey: string;
+  image: ImageAttachment | null;
+  setImage: (image: ImageAttachment | null) => void;
 }
 
-const InputCard: React.FC<InputCardProps> = ({ userInput, setUserInput, onGenerate, isLoading, apiKey }) => {
-  const isButtonDisabled = isLoading || !userInput.trim() || !apiKey;
-  
+const InputCard: React.FC<InputCardProps> = ({ userInput, setUserInput, onGenerate, isLoading, apiKey, image, setImage }) => {
+  const isButtonDisabled = isLoading || (!userInput.trim() && !image) || !apiKey;
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const handleFileChange = (file: File | null) => {
+    if (file && file.type.startsWith('image/')) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        const base64String = (reader.result as string).split(',')[1];
+        setImage({
+          mimeType: file.type,
+          data: base64String,
+        });
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const handlePaste = useCallback((event: React.ClipboardEvent) => {
+    const items = event.clipboardData.items;
+    for (let i = 0; i < items.length; i++) {
+      if (items[i].type.indexOf('image') !== -1) {
+        const file = items[i].getAsFile();
+        handleFileChange(file);
+        break; 
+      }
+    }
+  }, []);
+
   return (
     <div className="bg-slate-800 p-6 rounded-xl shadow-lg border border-slate-700">
       <label htmlFor="user-story" className="block text-lg font-medium text-slate-300 mb-2">
-        Historia de Usuario o Descripción Funcional.
+        Historia de Usuario o Descripcion Funcional.
       </label>
-      <textarea
-        id="user-story"
-        value={userInput}
-        onChange={(e) => setUserInput(e.target.value)}
-        placeholder="'Escriba aqui la historia de usuario... por ejemplo: Como usuario, quiero iniciar sesión con mi correo electrónico y contraseña para poder acceder a mi panel de control. (Obtendras mejores resultados si trabajamos una historia a la vez)'"
-        className="w-full h-48 p-4 bg-slate-900 border border-slate-600 rounded-lg focus:ring-2 focus:ring-brand-primary focus:border-brand-primary transition-colors duration-200 resize-y disabled:opacity-50 disabled:cursor-not-allowed"
-        disabled={isLoading || !apiKey}
-      />
+      <div className="relative">
+        <textarea
+          id="user-story"
+          value={userInput}
+          onChange={(e) => setUserInput(e.target.value)}
+          onPaste={handlePaste}
+          placeholder="'Escriba aqui la historia de usuario o pegue una imagen (Ctrl+V)... por ejemplo: Como usuario, quiero iniciar sesión con mi correo electrónico y contraseña para poder acceder a mi panel de control.'"
+          className="w-full h-48 p-4 bg-slate-900 border border-slate-600 rounded-lg focus:ring-2 focus:ring-brand-primary focus:border-brand-primary transition-colors duration-200 resize-y disabled:opacity-50 disabled:cursor-not-allowed"
+          disabled={isLoading || !apiKey}
+        />
+        {image && (
+          <div className="absolute bottom-3 left-3 bg-slate-900/80 p-1 rounded-lg border border-slate-600">
+             <div className="relative">
+              <img
+                src={`data:${image.mimeType};base64,${image.data}`}
+                alt="Image preview"
+                className="h-16 w-auto object-cover rounded"
+              />
+              <button
+                onClick={() => setImage(null)}
+                className="absolute -top-2 -right-2 bg-slate-800 rounded-full text-slate-400 hover:text-white hover:bg-brand-danger transition-all"
+                aria-label="Remove image"
+              >
+                <XCircleIcon className="w-6 h-6" />
+              </button>
+            </div>
+          </div>
+        )}
+      </div>
+
       <div className="text-right text-xs text-slate-500 mt-1 pr-1">
         {userInput.length.toLocaleString()} caracteres
       </div>
-      <div className="mt-4 flex justify-end">
+      <div className="mt-4 flex justify-end items-center gap-4">
+        <input
+            type="file"
+            ref={fileInputRef}
+            onChange={(e) => handleFileChange(e.target.files ? e.target.files[0] : null)}
+            accept="image/png, image/jpeg, image/webp"
+            className="hidden"
+        />
+        <button
+          onClick={() => fileInputRef.current?.click()}
+          disabled={isLoading || !apiKey}
+          className="flex items-center justify-center gap-2 px-4 py-3 bg-slate-700 text-slate-300 font-semibold rounded-lg shadow-md hover:bg-slate-600 disabled:bg-slate-600 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-300"
+          aria-label="Attach image"
+        >
+          <PaperclipIcon className="w-5 h-5" />
+        </button>
+        
         <button
           onClick={onGenerate}
           disabled={isButtonDisabled}

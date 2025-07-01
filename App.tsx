@@ -1,6 +1,6 @@
 
 import React, { useState, useCallback, useEffect } from 'react';
-import { RawScenario, ScenarioResult } from './types';
+import { RawScenario, ScenarioResult, ImageAttachment } from './types';
 import { generateTestScenarios } from './services/geminiService';
 import InputCard from './components/InputCard';
 import ResultsDisplay from './components/ResultsDisplay';
@@ -10,6 +10,7 @@ import { LinkedInIcon } from './components/icons/LinkedInIcon';
 
 function App() {
   const [userInput, setUserInput] = useState<string>('');
+  const [image, setImage] = useState<ImageAttachment | null>(null);
   const [scenarios, setScenarios] = useState<ScenarioResult[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
@@ -33,13 +34,13 @@ function App() {
   };
 
   const handleGenerate = useCallback(async () => {
-    if (!userInput.trim() || isLoading || !apiKey) return;
+    if ((!userInput.trim() && !image) || isLoading || !apiKey) return;
 
     setIsLoading(true);
     setError(null);
 
     try {
-      const result: RawScenario[] = await generateTestScenarios(userInput, apiKey);
+      const result: RawScenario[] = await generateTestScenarios(userInput, apiKey, image);
       const newScenarios: ScenarioResult[] = result.map((scenario, index) => ({
         id: `${Date.now()}-${index}`,
         title: scenario.title,
@@ -53,11 +54,13 @@ function App() {
     } finally {
       setIsLoading(false);
     }
-  }, [userInput, isLoading, apiKey]);
+  }, [userInput, isLoading, apiKey, image]);
 
   const handleClear = useCallback(() => {
     setScenarios([]);
     setError(null);
+    setImage(null);
+    setUserInput('');
   }, []);
 
   return (
@@ -83,6 +86,8 @@ function App() {
             onGenerate={handleGenerate}
             isLoading={isLoading}
             apiKey={apiKey}
+            image={image}
+            setImage={setImage}
           />
         </div>
 
@@ -98,8 +103,14 @@ function App() {
       <footer className="text-center mt-12 text-slate-500 text-sm">
         <div className="flex justify-center items-center gap-2 mb-2">
           <span>Created by Erich Petrocelli</span>
-          <a href="https://www.linkedin.com/in/erichpetrocelli/" target="_blank" rel="noopener noreferrer" aria-label="Erich Petrocelli's LinkedIn Profile" className="text-slate-400 hover:text-brand-primary transition-colors">
-            <LinkedInIcon className="w-6 h-6" />
+          <a 
+            href="https://www.linkedin.com/in/erichpetrocelli/" 
+            target="_blank" 
+            rel="noopener noreferrer" 
+            aria-label="Erich Petrocelli's LinkedIn Profile" 
+            className="text-slate-400 hover:opacity-80 transition-opacity"
+          >
+            <LinkedInIcon className="w-7 h-7" />
           </a>
         </div>
         <p className="text-slate-600 mt-1">API Key is stored in your browser's local storage.</p>

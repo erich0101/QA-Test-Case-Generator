@@ -1,3 +1,4 @@
+
 import React, { useState, useCallback, useEffect } from 'react';
 import { RawScenario, ScenarioResult } from './types';
 import { generateTestScenarios } from './services/geminiService';
@@ -5,6 +6,7 @@ import InputCard from './components/InputCard';
 import ResultsDisplay from './components/ResultsDisplay';
 import { SparklesIcon } from './components/icons/SparklesIcon';
 import ApiKeyManager from './components/ApiKeyManager';
+import { LinkedInIcon } from './components/icons/LinkedInIcon';
 
 function App() {
   const [userInput, setUserInput] = useState<string>('');
@@ -94,7 +96,12 @@ function App() {
         <ResultsDisplay scenarios={scenarios} onClear={handleClear} />
       </main>
       <footer className="text-center mt-12 text-slate-500 text-sm">
-        <p>Built by a world-class senior frontend React engineer.</p>
+        <div className="flex justify-center items-center gap-2 mb-2">
+          <span>Created by Erich Petrocelli</span>
+          <a href="https://www.linkedin.com/in/erichpetrocelli/" target="_blank" rel="noopener noreferrer" aria-label="Erich Petrocelli's LinkedIn Profile" className="text-slate-400 hover:text-brand-primary transition-colors">
+            <LinkedInIcon className="w-6 h-6" />
+          </a>
+        </div>
         <p className="text-slate-600 mt-1">API Key is stored in your browser's local storage.</p>
       </footer>
     </div>

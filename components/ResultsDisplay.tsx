@@ -1,6 +1,7 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { ScenarioResult } from '../types';
 import ScenarioCard from './ScenarioCard';
+import { ClipboardIcon } from './icons/ClipboardIcon';
 
 interface ResultsDisplayProps {
   scenarios: ScenarioResult[];
@@ -8,9 +9,27 @@ interface ResultsDisplayProps {
 }
 
 const ResultsDisplay: React.FC<ResultsDisplayProps> = ({ scenarios, onClear }) => {
+  const [isCopied, setIsCopied] = useState(false);
+
   if (scenarios.length === 0) {
     return null;
   }
+
+  const formatScenarioToText = (scenario: ScenarioResult): string => {
+    const criteriaText = scenario.criteria.map(c => `• ${c}`).join('\n');
+    return `Título: ${scenario.title}\n\n${scenario.gherkin}\n\nCriterios de Aceptación:\n${criteriaText}`;
+  };
+
+  const handleCopyAll = () => {
+    const allScenariosText = scenarios
+      .map(formatScenarioToText)
+      .join('\n\n---\n\n');
+    
+    navigator.clipboard.writeText(allScenariosText).then(() => {
+      setIsCopied(true);
+      setTimeout(() => setIsCopied(false), 2000);
+    });
+  };
 
   return (
     <div className="mt-8 space-y-6">
@@ -18,13 +37,23 @@ const ResultsDisplay: React.FC<ResultsDisplayProps> = ({ scenarios, onClear }) =
         <h2 className="text-2xl font-bold text-slate-200">
           Escenarios Generados ({scenarios.length})
         </h2>
-        <button
-          onClick={onClear}
-          className="px-4 py-2 text-sm font-semibold text-rose-300 bg-rose-900/50 border border-brand-danger rounded-lg hover:bg-rose-800/70 transition-colors duration-200"
-          aria-label="Borra todos los escenarios"
-        >
-          Clear All
-        </button>
+        <div className="flex items-center gap-2">
+           <button
+            onClick={handleCopyAll}
+            className="flex items-center gap-2 px-3 py-2 text-sm font-semibold text-cyan-300 bg-cyan-900/50 border border-brand-primary rounded-lg hover:bg-cyan-800/70 transition-colors duration-200"
+            aria-label="Copiar todos los escenarios"
+          >
+            <ClipboardIcon className="w-4 h-4" />
+            <span>{isCopied ? 'All Copied!' : 'Copy All'}</span>
+          </button>
+          <button
+            onClick={onClear}
+            className="px-4 py-2 text-sm font-semibold text-rose-300 bg-rose-900/50 border border-brand-danger rounded-lg hover:bg-rose-800/70 transition-colors duration-200"
+            aria-label="Borra todos los escenarios"
+          >
+            Clear All
+          </button>
+        </div>
       </div>
 
       {scenarios.map((scenario) => (

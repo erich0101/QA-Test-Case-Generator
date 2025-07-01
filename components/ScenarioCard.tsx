@@ -1,17 +1,37 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { ScenarioResult } from '../types';
 import AcceptanceCriterion from './AcceptanceCriterion';
+import { ClipboardIcon } from './icons/ClipboardIcon';
 
 interface ScenarioCardProps {
   scenario: ScenarioResult;
 }
 
 const ScenarioCard: React.FC<ScenarioCardProps> = ({ scenario }) => {
+  const [isCopied, setIsCopied] = useState(false);
+
+  const handleCopy = () => {
+    const criteriaText = scenario.criteria.map(c => `• ${c}`).join('\n');
+    const fullText = `Título: ${scenario.title}\n\n${scenario.gherkin}\n\nCriterios de Aceptación:\n${criteriaText}`;
+    
+    navigator.clipboard.writeText(fullText).then(() => {
+      setIsCopied(true);
+      setTimeout(() => setIsCopied(false), 2000); // Reset after 2 seconds
+    });
+  };
   
   return (
     <article className="bg-slate-800/50 border border-slate-700 rounded-xl shadow-lg overflow-hidden transition-all duration-300 hover:border-brand-primary hover:shadow-cyan-500/10">
-      <header className="p-4 bg-slate-800 border-b border-slate-700">
+      <header className="p-4 bg-slate-800 border-b border-slate-700 flex justify-between items-center">
         <h3 className="text-xl font-semibold text-cyan-400">{scenario.title}</h3>
+        <button 
+          onClick={handleCopy}
+          className="flex items-center gap-2 px-3 py-1.5 text-xs font-semibold text-slate-300 bg-slate-700 rounded-md hover:bg-slate-600 transition-colors duration-200"
+          aria-label="Copiar escenario"
+        >
+          <ClipboardIcon className="w-4 h-4" />
+          <span>{isCopied ? 'Copiado!' : 'Copiar'}</span>
+        </button>
       </header>
       
       <div className="p-4 space-y-4">

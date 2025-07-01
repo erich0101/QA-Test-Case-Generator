@@ -16,7 +16,7 @@ const InputCard: React.FC<InputCardProps> = ({ userInput, setUserInput, onGenera
   return (
     <div className="bg-slate-800 p-6 rounded-xl shadow-lg border border-slate-700">
       <label htmlFor="user-story" className="block text-lg font-medium text-slate-300 mb-2">
-        Historia de Usuario o Descripcion Funcional.
+        Historia de Usuario o Descripción Funcional.
       </label>
       <textarea
         id="user-story"

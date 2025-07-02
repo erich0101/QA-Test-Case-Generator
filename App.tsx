@@ -1,4 +1,3 @@
-
 import React, { useState, useCallback, useEffect } from 'react';
 import { RawScenario, ScenarioResult, ImageAttachment } from './types';
 import { generateTestScenarios } from './services/geminiService';
@@ -7,7 +6,6 @@ import ResultsDisplay from './components/ResultsDisplay';
 import { SparklesIcon } from './components/icons/SparklesIcon';
 import ApiKeyManager from './components/ApiKeyManager';
 import { LinkedInIcon } from './components/icons/LinkedInIcon';
-import InvalidFileModal from './components/InvalidFileModal';
 import InfoModal from './components/InfoModal';
 import { QuestionMarkCircleIcon } from './components/icons/QuestionMarkCircleIcon';
 
@@ -18,7 +16,6 @@ function App() {
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
   const [apiKey, setApiKey] = useState<string>('');
-  const [showInvalidFileModal, setShowInvalidFileModal] = useState(false);
   const [showInfoModal, setShowInfoModal] = useState(false);
 
   useEffect(() => {
@@ -67,10 +64,6 @@ function App() {
     setImage(null);
     setUserInput('');
   }, []);
-  
-  const handleInvalidFileType = () => {
-    setShowInvalidFileModal(true);
-  };
 
   return (
     <div className="min-h-screen bg-slate-900 font-sans p-4 sm:p-6 lg:p-8">
@@ -99,7 +92,6 @@ function App() {
               apiKey={apiKey}
               image={image}
               setImage={setImage}
-              onInvalidFileType={handleInvalidFileType}
             />
             <button
               onClick={() => setShowInfoModal(true)}
@@ -137,10 +129,6 @@ function App() {
         <p className="text-slate-600 mt-1">API Key is stored in your browser's local storage.</p>
       </footer>
       
-      <InvalidFileModal 
-        isOpen={showInvalidFileModal}
-        onClose={() => setShowInvalidFileModal(false)}
-      />
       <InfoModal
         isOpen={showInfoModal}
         onClose={() => setShowInfoModal(false)}

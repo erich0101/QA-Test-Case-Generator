@@ -7,6 +7,9 @@ import ResultsDisplay from './components/ResultsDisplay';
 import { SparklesIcon } from './components/icons/SparklesIcon';
 import ApiKeyManager from './components/ApiKeyManager';
 import { LinkedInIcon } from './components/icons/LinkedInIcon';
+import InvalidFileModal from './components/InvalidFileModal';
+import InfoModal from './components/InfoModal';
+import { QuestionMarkCircleIcon } from './components/icons/QuestionMarkCircleIcon';
 
 function App() {
   const [userInput, setUserInput] = useState<string>('');
@@ -15,6 +18,8 @@ function App() {
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
   const [apiKey, setApiKey] = useState<string>('');
+  const [showInvalidFileModal, setShowInvalidFileModal] = useState(false);
+  const [showInfoModal, setShowInfoModal] = useState(false);
 
   useEffect(() => {
     // Load API key from local storage on initial render
@@ -62,15 +67,19 @@ function App() {
     setImage(null);
     setUserInput('');
   }, []);
+  
+  const handleInvalidFileType = () => {
+    setShowInvalidFileModal(true);
+  };
 
   return (
     <div className="min-h-screen bg-slate-900 font-sans p-4 sm:p-6 lg:p-8">
       <main className="max-w-4xl mx-auto">
         <header className="text-center mb-8">
           <div className="flex items-center justify-center gap-4 mb-2">
-            <SparklesIcon className="w-10 h-10 text-brand-primary" />
+            <SparklesIcon className="w-7 h-7 text-brand-primary" />
             <h1 className="text-3xl sm:text-4xl font-bold text-slate-100">
-              QA Test Case Generator By Erich Petrocelli
+              QA Test Case Generator
             </h1>
           </div>
           <p className="text-slate-400">
@@ -80,15 +89,27 @@ function App() {
 
         <div className="space-y-6">
           <ApiKeyManager apiKey={apiKey} onApiKeyChange={handleApiKeyChange} />
-          <InputCard
-            userInput={userInput}
-            setUserInput={setUserInput}
-            onGenerate={handleGenerate}
-            isLoading={isLoading}
-            apiKey={apiKey}
-            image={image}
-            setImage={setImage}
-          />
+          
+          <div className="flex flex-col items-center">
+            <InputCard
+              userInput={userInput}
+              setUserInput={setUserInput}
+              onGenerate={handleGenerate}
+              isLoading={isLoading}
+              apiKey={apiKey}
+              image={image}
+              setImage={setImage}
+              onInvalidFileType={handleInvalidFileType}
+            />
+            <button
+              onClick={() => setShowInfoModal(true)}
+              className="flex items-center gap-2 mt-4 text-sm text-yellow-400"
+              aria-label="About this application"
+            >
+              <QuestionMarkCircleIcon className="w-8 h-8 text-yellow-400" />
+              <span>Información importante sobre el uso y limitaciones</span>
+            </button>
+          </div>
         </div>
 
         {error && (
@@ -115,6 +136,15 @@ function App() {
         </div>
         <p className="text-slate-600 mt-1">API Key is stored in your browser's local storage.</p>
       </footer>
+      
+      <InvalidFileModal 
+        isOpen={showInvalidFileModal}
+        onClose={() => setShowInvalidFileModal(false)}
+      />
+      <InfoModal
+        isOpen={showInfoModal}
+        onClose={() => setShowInfoModal(false)}
+      />
     </div>
   );
 }

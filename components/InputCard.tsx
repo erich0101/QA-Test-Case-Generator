@@ -13,14 +13,17 @@ interface InputCardProps {
   apiKey: string;
   image: ImageAttachment | null;
   setImage: (image: ImageAttachment | null) => void;
+  onInvalidFileType: () => void;
 }
 
-const InputCard: React.FC<InputCardProps> = ({ userInput, setUserInput, onGenerate, isLoading, apiKey, image, setImage }) => {
+const InputCard: React.FC<InputCardProps> = ({ userInput, setUserInput, onGenerate, isLoading, apiKey, image, setImage, onInvalidFileType }) => {
   const isButtonDisabled = isLoading || (!userInput.trim() && !image) || !apiKey;
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const handleFileChange = (file: File | null) => {
-    if (file && file.type.startsWith('image/')) {
+  const processFile = (file: File | null) => {
+    if (!file) return;
+
+    if (file.type.startsWith('image/')) {
       const reader = new FileReader();
       reader.onloadend = () => {
         const base64String = (reader.result as string).split(',')[1];
@@ -30,6 +33,17 @@ const InputCard: React.FC<InputCardProps> = ({ userInput, setUserInput, onGenera
         });
       };
       reader.readAsDataURL(file);
+    } else {
+      onInvalidFileType();
+    }
+  };
+
+  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files ? event.target.files[0] : null;
+    processFile(file);
+    // Reset file input to allow selecting the same file again
+    if(event.target) {
+        event.target.value = '';
     }
   };
 
@@ -38,14 +52,14 @@ const InputCard: React.FC<InputCardProps> = ({ userInput, setUserInput, onGenera
     for (let i = 0; i < items.length; i++) {
       if (items[i].type.indexOf('image') !== -1) {
         const file = items[i].getAsFile();
-        handleFileChange(file);
+        processFile(file);
         break; 
       }
     }
-  }, []);
+  }, [onInvalidFileType]);
 
   return (
-    <div className="bg-slate-800 p-6 rounded-xl shadow-lg border border-slate-700">
+    <div className="w-full bg-slate-800 p-6 rounded-xl shadow-lg border border-slate-700">
       <label htmlFor="user-story" className="block text-lg font-medium text-slate-300 mb-2">
         Historia de Usuario o Descripcion Funcional.
       </label>
@@ -86,8 +100,8 @@ const InputCard: React.FC<InputCardProps> = ({ userInput, setUserInput, onGenera
         <input
             type="file"
             ref={fileInputRef}
-            onChange={(e) => handleFileChange(e.target.files ? e.target.files[0] : null)}
-            accept="image/png, image/jpeg, image/webp"
+            onChange={handleFileChange}
+            accept="*/*"
             className="hidden"
         />
         <button

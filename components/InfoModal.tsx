@@ -29,27 +29,34 @@ const InfoModal: React.FC<InfoModalProps> = ({ isOpen, onClose }) => {
         </div>
         
         <div className="text-slate-300 space-y-5 max-h-[60vh] overflow-y-auto pr-2">
+          <section>
+                <h3 className="font-semibold text-lg text-cyan-400 mb-2">1. Aclaración Clave de Buenas Prácticas</h3>
+                <p>
+                    El análisis inicial y la comprensión profunda de cualquier historia de usuario o funcionalidad <strong className="text-slate-100">son responsabilidad del profesional de calidad.</strong> Esta herramienta no sustituye este paso crítico. Su función es ser un catalizador: acelera la redacción y facilita la edición de los casos de prueba. Cada escenario generado debe ser revisado, validado y ajustado por un experto antes de ser considerado 100% correcto y válido.
+                </p>
+            </section>
+
             <section>
-                <h3 className="font-semibold text-lg text-cyan-400 mb-2">1. Propósito y Objetivo</h3>
+                <h3 className="font-semibold text-lg text-cyan-400 mb-2">2. Propósito y Objetivo</h3>
                 <p>
                     El objetivo principal de esta herramienta es <strong className="text-slate-100">acelerar drásticamente la creación de casos de prueba</strong> para equipos de QA y desarrollo. Utiliza IA para transformar historias de usuario y descripciones funcionales en escenarios de prueba detallados, liberando tiempo valioso para que los equipos se enfoquen en la estrategia de pruebas y la calidad del producto.
                 </p>
             </section>
             
             <section>
-                <h3 className="font-semibold text-lg text-cyan-400 mb-2">2. Enfoque Principal: BDD y Pruebas Funcionales</h3>
+                <h3 className="font-semibold text-lg text-cyan-400 mb-2">3. Enfoque Principal: BDD y Pruebas Funcionales</h3>
                 <p>
                     La aplicación está especializada en generar escenarios de prueba en formato <strong className="text-slate-100">Gherkin (Dado, Cuando, Entonces)</strong> para metodologías BDD. Su punto fuerte es la creación de pruebas funcionales que validan el comportamiento observable por el usuario (frontend y flujos de la UI).
                 </p>
             </section>
             
             <section>
-                <h3 className="font-semibold text-lg text-rose-400 mb-2">3. Limitaciones Importantes (Para mejores resultados)</h3>
+                <h3 className="font-semibold text-lg text-rose-400 mb-2">4. Limitaciones Importantes (Para mejores resultados)</h3>
                 <ul className="list-disc list-inside space-y-2 text-slate-400">
                     <li><strong className="text-slate-200">Es un Asistente, no un Reemplazo:</strong> La IA es una herramienta de apoyo poderosa, pero la revisión y el criterio de un profesional de QA son insustituibles para garantizar la calidad final.</li>
                     <li><strong className="text-slate-200">La Calidad del Input es Clave:</strong> Una historia de usuario ambigua o mal definida generará casos de prueba igualmente ambiguos. Sé lo más claro y detallado posible en tu descripción.</li>
                     <li><strong className="text-slate-200">Análisis de Imágenes:</strong> La función de adjuntar imágenes es ideal para capturas de pantalla de interfaces de usuario (UI). El análisis de texto en imágenes complejas (OCR) puede tener imprecisiones.</li>
-                    <li><strong className="text-slate-200">No Ejecuta Pruebas:</strong> Esta herramienta genera los Escenarios de los casos de prueba, no los ejecuta.</li>
+                    <li><strong className="text-slate-200">No Ejecuta Pruebas:</strong> Esta herramienta genera los *scripts* de los casos de prueba, no los ejecuta.</li>
                 </ul>
             </section>
         </div>

@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { ScenarioResult } from '../types';
 import AcceptanceCriterion from './AcceptanceCriterion';
@@ -5,19 +6,41 @@ import { ClipboardIcon } from './icons/ClipboardIcon';
 
 interface ScenarioCardProps {
   scenario: ScenarioResult;
+  copiedScenarioIds: string[];
+  setCopiedScenarioIds: (ids: string[] | ((prevIds: string[]) => string[])) => void;
+  setShowCopyWarningModal: (show: boolean) => void;
+  setCopyAction: (action: (() => void) | null) => void;
 }
 
-const ScenarioCard: React.FC<ScenarioCardProps> = ({ scenario }) => {
+const ScenarioCard: React.FC<ScenarioCardProps> = ({ 
+  scenario,
+  copiedScenarioIds,
+  setCopiedScenarioIds,
+  setShowCopyWarningModal,
+  setCopyAction
+ }) => {
   const [isCopied, setIsCopied] = useState(false);
 
   const handleCopy = () => {
-    const criteriaText = scenario.criteria.map(c => `• ${c}`).join('\n');
-    const fullText = `Título: ${scenario.title}\n\n${scenario.gherkin}\n\nCriterios de Aceptación:\n${criteriaText}`;
-    
-    navigator.clipboard.writeText(fullText).then(() => {
-      setIsCopied(true);
-      setTimeout(() => setIsCopied(false), 2000); // Reset after 2 seconds
-    });
+    const copyLogic = () => {
+      const criteriaText = scenario.criteria.map(c => `• ${c}`).join('\n');
+      const fullText = `Título: ${scenario.title}\n\n${scenario.gherkin}\n\nCriterios de Aceptación:\n${criteriaText}`;
+      
+      navigator.clipboard.writeText(fullText).then(() => {
+        setIsCopied(true);
+        if (!copiedScenarioIds.includes(scenario.id)) {
+            setCopiedScenarioIds(prev => [...prev, scenario.id]);
+        }
+        setTimeout(() => setIsCopied(false), 2000); // Reset after 2 seconds
+      });
+    };
+
+    if (copiedScenarioIds.includes(scenario.id)) {
+        setCopyAction(() => copyLogic);
+        setShowCopyWarningModal(true);
+    } else {
+        copyLogic();
+    }
   };
   
   return (

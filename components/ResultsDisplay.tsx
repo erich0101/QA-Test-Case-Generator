@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { ScenarioResult } from '../types';
 import ScenarioCard from './ScenarioCard';
@@ -6,9 +7,20 @@ import { ClipboardIcon } from './icons/ClipboardIcon';
 interface ResultsDisplayProps {
   scenarios: ScenarioResult[];
   onClear: () => void;
+  copiedScenarioIds: string[];
+  setCopiedScenarioIds: (ids: string[] | ((prevIds: string[]) => string[])) => void;
+  setShowCopyWarningModal: (show: boolean) => void;
+  setCopyAction: (action: (() => void) | null) => void;
 }
 
-const ResultsDisplay: React.FC<ResultsDisplayProps> = ({ scenarios, onClear }) => {
+const ResultsDisplay: React.FC<ResultsDisplayProps> = ({ 
+  scenarios, 
+  onClear,
+  copiedScenarioIds,
+  setCopiedScenarioIds,
+  setShowCopyWarningModal,
+  setCopyAction
+ }) => {
   const [isCopied, setIsCopied] = useState(false);
 
   if (scenarios.length === 0) {
@@ -21,14 +33,26 @@ const ResultsDisplay: React.FC<ResultsDisplayProps> = ({ scenarios, onClear }) =
   };
 
   const handleCopyAll = () => {
-    const allScenariosText = scenarios
-      .map(formatScenarioToText)
-      .join('\n\n---\n\n');
-    
-    navigator.clipboard.writeText(allScenariosText).then(() => {
-      setIsCopied(true);
-      setTimeout(() => setIsCopied(false), 2000);
-    });
+    const copyLogic = () => {
+      const allScenariosText = scenarios
+        .map(formatScenarioToText)
+        .join('\n\n---\n\n');
+      
+      navigator.clipboard.writeText(allScenariosText).then(() => {
+        setIsCopied(true);
+        setCopiedScenarioIds(scenarios.map(s => s.id));
+        setTimeout(() => setIsCopied(false), 2000);
+      });
+    };
+
+    const allHaveBeenCopied = scenarios.length > 0 && scenarios.every(s => copiedScenarioIds.includes(s.id));
+
+    if (allHaveBeenCopied) {
+      setCopyAction(() => copyLogic);
+      setShowCopyWarningModal(true);
+    } else {
+      copyLogic();
+    }
   };
 
   return (
@@ -60,6 +84,10 @@ const ResultsDisplay: React.FC<ResultsDisplayProps> = ({ scenarios, onClear }) =
         <ScenarioCard 
           key={scenario.id} 
           scenario={scenario} 
+          copiedScenarioIds={copiedScenarioIds}
+          setCopiedScenarioIds={setCopiedScenarioIds}
+          setShowCopyWarningModal={setShowCopyWarningModal}
+          setCopyAction={setCopyAction}
         />
       ))}
     </div>

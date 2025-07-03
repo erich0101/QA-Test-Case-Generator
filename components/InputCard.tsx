@@ -11,36 +11,41 @@ interface InputCardProps {
   onGenerate: () => void;
   isLoading: boolean;
   apiKey: string;
-  image: ImageAttachment | null;
-  setImage: (image: ImageAttachment | null) => void;
+  images: ImageAttachment[];
+  setImages: (update: React.SetStateAction<ImageAttachment[]>) => void;
   onInvalidFileType: () => void;
 }
 
-const InputCard: React.FC<InputCardProps> = ({ userInput, setUserInput, onGenerate, isLoading, apiKey, image, setImage, onInvalidFileType }) => {
-  const isButtonDisabled = isLoading || (!userInput.trim() && !image) || !apiKey;
+const InputCard: React.FC<InputCardProps> = ({ userInput, setUserInput, onGenerate, isLoading, apiKey, images, setImages, onInvalidFileType }) => {
+  const isButtonDisabled = isLoading || (!userInput.trim() && images.length === 0) || !apiKey;
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const processFile = (file: File | null) => {
+  const processFile = useCallback((file: File | null) => {
     if (!file) return;
 
     if (file.type.startsWith('image/')) {
       const reader = new FileReader();
       reader.onloadend = () => {
         const base64String = (reader.result as string).split(',')[1];
-        setImage({
+        setImages(prevImages => [...prevImages, {
           mimeType: file.type,
           data: base64String,
-        });
+        }]);
       };
       reader.readAsDataURL(file);
     } else {
       onInvalidFileType();
     }
-  };
+  }, [setImages, onInvalidFileType]);
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files ? event.target.files[0] : null;
-    processFile(file);
+    const files = event.target.files;
+    if (!files) return;
+
+    for (const file of Array.from(files)) {
+      processFile(file);
+    }
+    
     // Reset file input to allow selecting the same file again
     if(event.target) {
         event.target.value = '';
@@ -52,11 +57,15 @@ const InputCard: React.FC<InputCardProps> = ({ userInput, setUserInput, onGenera
     for (let i = 0; i < items.length; i++) {
       if (items[i].type.indexOf('image') !== -1) {
         const file = items[i].getAsFile();
-        processFile(file);
-        break; 
+        processFile(file); 
       }
     }
-  }, [onInvalidFileType]);
+  }, [processFile]);
+
+  const handleRemoveImage = (indexToRemove: number) => {
+    setImages(prevImages => prevImages.filter((_, index) => index !== indexToRemove));
+  };
+
 
   return (
     <div className="w-full bg-slate-800 p-6 rounded-xl shadow-lg border border-slate-700">
@@ -73,22 +82,24 @@ const InputCard: React.FC<InputCardProps> = ({ userInput, setUserInput, onGenera
           className="w-full h-48 p-4 bg-slate-900 border border-slate-600 rounded-lg focus:ring-2 focus:ring-brand-primary focus:border-brand-primary transition-colors duration-200 resize-y disabled:opacity-50 disabled:cursor-not-allowed"
           disabled={isLoading || !apiKey}
         />
-        {image && (
-          <div className="absolute bottom-3 left-3 bg-slate-900/80 p-1 rounded-lg border border-slate-600">
-             <div className="relative">
-              <img
-                src={`data:${image.mimeType};base64,${image.data}`}
-                alt="Image preview"
-                className="h-16 w-auto object-cover rounded"
-              />
-              <button
-                onClick={() => setImage(null)}
-                className="absolute -top-2 -right-2 bg-slate-800 rounded-full text-slate-400 hover:text-white hover:bg-brand-danger transition-all"
-                aria-label="Remove image"
-              >
-                <XCircleIcon className="w-6 h-6" />
-              </button>
-            </div>
+        {images.length > 0 && (
+          <div className="absolute bottom-3 left-3 flex gap-2 p-2 bg-slate-900/80 rounded-lg border border-slate-600 max-w-[calc(100%-1.5rem)] overflow-x-auto">
+             {images.map((image, index) => (
+                <div key={index} className="relative flex-shrink-0">
+                  <img
+                    src={`data:${image.mimeType};base64,${image.data}`}
+                    alt={`Preview ${index + 1}`}
+                    className="h-16 w-auto object-cover rounded"
+                  />
+                  <button
+                    onClick={() => handleRemoveImage(index)}
+                    className="absolute -top-2 -right-2 bg-slate-800 rounded-full text-slate-400 hover:text-white hover:bg-brand-danger transition-all"
+                    aria-label={`Remove image ${index + 1}`}
+                  >
+                    <XCircleIcon className="w-6 h-6" />
+                  </button>
+                </div>
+            ))}
           </div>
         )}
       </div>
@@ -101,8 +112,9 @@ const InputCard: React.FC<InputCardProps> = ({ userInput, setUserInput, onGenera
             type="file"
             ref={fileInputRef}
             onChange={handleFileChange}
-            accept="*/*"
+            accept="image/*"
             className="hidden"
+            multiple
         />
         <button
           onClick={() => fileInputRef.current?.click()}

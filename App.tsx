@@ -14,7 +14,7 @@ import AlreadyCopiedModal from './components/AlreadyCopiedModal';
 
 function App() {
   const [userInput, setUserInput] = useState<string>('');
-  const [image, setImage] = useState<ImageAttachment | null>(null);
+  const [images, setImages] = useState<ImageAttachment[]>([]);
   const [scenarios, setScenarios] = useState<ScenarioResult[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
@@ -44,13 +44,13 @@ function App() {
   };
 
   const handleGenerate = useCallback(async () => {
-    if ((!userInput.trim() && !image) || isLoading || !apiKey) return;
+    if ((!userInput.trim() && images.length === 0) || isLoading || !apiKey) return;
 
     setIsLoading(true);
     setError(null);
 
     try {
-      const result: RawScenario[] = await generateTestScenarios(userInput, apiKey, image);
+      const result: RawScenario[] = await generateTestScenarios(userInput, apiKey, images);
       const newScenarios: ScenarioResult[] = result.map((scenario, index) => ({
         id: `${Date.now()}-${index}`,
         title: scenario.title,
@@ -64,12 +64,12 @@ function App() {
     } finally {
       setIsLoading(false);
     }
-  }, [userInput, isLoading, apiKey, image]);
+  }, [userInput, isLoading, apiKey, images]);
 
   const handleClear = useCallback(() => {
     setScenarios([]);
     setError(null);
-    setImage(null);
+    setImages([]);
     setUserInput('');
     setCopiedScenarioIds([]); // Reset copied tracker
   }, []);
@@ -111,8 +111,8 @@ function App() {
               onGenerate={handleGenerate}
               isLoading={isLoading}
               apiKey={apiKey}
-              image={image}
-              setImage={setImage}
+              images={images}
+              setImages={setImages}
               onInvalidFileType={handleInvalidFileType}
             />
             <button

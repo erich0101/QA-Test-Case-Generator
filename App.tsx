@@ -8,6 +8,7 @@ import ApiResultsDisplay from './components/ApiResultsDisplay';
 import { SparklesIcon } from './components/icons/SparklesIcon';
 import ApiKeyManager from './components/ApiKeyManager';
 import { LinkedInIcon } from './components/icons/LinkedInIcon';
+import { GithubIcon } from './components/icons/GithubIcon';
 import InvalidFileModal from './components/InvalidFileModal';
 import InfoModal from './components/InfoModal';
 import { QuestionMarkCircleIcon } from './components/icons/QuestionMarkCircleIcon';
@@ -220,7 +221,7 @@ function App() {
         )}
       </main>
       <footer className="text-center mt-12 text-slate-500 text-sm">
-        <div className="flex justify-center items-center gap-2 mb-2">
+        <div className="flex justify-center items-center gap-3 mb-2">
           <span>Created by Erich Petrocelli</span>
           <a 
             href="https://www.linkedin.com/in/erichpetrocelli/" 
@@ -230,6 +231,15 @@ function App() {
             className="text-slate-400 hover:opacity-80 transition-opacity"
           >
             <LinkedInIcon className="w-7 h-7" />
+          </a>
+          <a 
+            href="https://github.com/erich0101/QA-Test-Case-Generator" 
+            target="_blank" 
+            rel="noopener noreferrer" 
+            aria-label="Project's GitHub Repository" 
+            className="text-slate-400 hover:text-white transition-colors"
+          >
+            <GithubIcon className="w-6 h-6" />
           </a>
         </div>
         <p className="text-slate-600 mt-1">API Key is stored encrypted in your browser's local storage.</p>

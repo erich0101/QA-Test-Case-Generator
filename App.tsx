@@ -201,7 +201,7 @@ function App() {
           </div>
         )}
 
-        {scenarios.length > 0 && (
+        {mode === 'e2e' && scenarios.length > 0 && (
           <ResultsDisplay 
             scenarios={scenarios} 
             onClear={handleClear}
@@ -212,7 +212,7 @@ function App() {
           />
         )}
         
-        {apiScenarios.length > 0 && (
+        {mode === 'api' && apiScenarios.length > 0 && (
           <ApiResultsDisplay
             scenarios={apiScenarios}
             onClear={handleClear}

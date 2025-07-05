@@ -1,4 +1,3 @@
-
 import React, { useState, useCallback, useEffect } from 'react';
 import { RawScenario, ScenarioResult, ImageAttachment } from './types';
 import { generateTestScenarios } from './services/geminiService';
@@ -11,6 +10,7 @@ import InvalidFileModal from './components/InvalidFileModal';
 import InfoModal from './components/InfoModal';
 import { QuestionMarkCircleIcon } from './components/icons/QuestionMarkCircleIcon';
 import AlreadyCopiedModal from './components/AlreadyCopiedModal';
+import { encrypt, decrypt } from './services/secureStore';
 
 function App() {
   const [userInput, setUserInput] = useState<string>('');
@@ -27,17 +27,19 @@ function App() {
 
 
   useEffect(() => {
-    // Load API key from local storage on initial render
+    // Carga y descifra la clave de API del almacenamiento local en el renderizado inicial
     const storedApiKey = localStorage.getItem('gemini_api_key');
     if (storedApiKey) {
-      setApiKey(storedApiKey);
+      const decryptedKey = decrypt(storedApiKey);
+      setApiKey(decryptedKey);
     }
   }, []);
 
   const handleApiKeyChange = (newKey: string) => {
     setApiKey(newKey);
     if (newKey) {
-      localStorage.setItem('gemini_api_key', newKey);
+      const encryptedKey = encrypt(newKey);
+      localStorage.setItem('gemini_api_key', encryptedKey);
     } else {
       localStorage.removeItem('gemini_api_key');
     }
@@ -155,7 +157,7 @@ function App() {
             <LinkedInIcon className="w-7 h-7" />
           </a>
         </div>
-        <p className="text-slate-600 mt-1">API Key is stored in your browser's local storage.</p>
+        <p className="text-slate-600 mt-1">API Key is stored encrypted in your browser's local storage.</p>
       </footer>
       
       <InvalidFileModal 

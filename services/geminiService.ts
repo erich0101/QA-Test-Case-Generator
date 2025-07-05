@@ -1,4 +1,3 @@
-
 import { GoogleGenAI } from "@google/genai";
 import { SYSTEM_PROMPT, API_CURL_TEST_PROMPT } from '../constants';
 import { RawScenario, ImageAttachment, ApiScenario } from '../types';
@@ -74,10 +73,18 @@ export async function generateScenarios(
       throw new Error('La respuesta de la API estaba vacía.');
     }
 
-    const fenceRegex = /^```(\w*)?\s*\n?(.*?)\n?\s*```$/s;
-    const match = jsonStr.match(fenceRegex);
-    if (match && match[2]) {
-      jsonStr = match[2].trim();
+    // Nueva lógica para extraer solo el JSON entre [ y ]
+    const arrayRegex = /^[^[]*\[([\s\S]*?)\][^]]*$/;
+    const arrayMatch = jsonStr.match(arrayRegex);
+    if (arrayMatch && arrayMatch[1] !== undefined) {
+      jsonStr = `[${arrayMatch[1].trim()}]`;
+    } else {
+      // Si no se encuentra un array, intentamos con la regex original de cerca
+      const fenceRegex = /^```(\w*)?\s*\n?(.*?)\n?\s*```$/s;
+      const match = jsonStr.match(fenceRegex);
+      if (match && match[2]) {
+        jsonStr = match[2].trim();
+      }
     }
 
     const parsedData = JSON.parse(jsonStr);

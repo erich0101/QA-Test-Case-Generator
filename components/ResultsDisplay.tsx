@@ -1,8 +1,9 @@
-
 import React, { useState } from 'react';
 import { ScenarioResult } from '../types';
 import ScenarioCard from './ScenarioCard';
 import { ClipboardIcon } from './icons/ClipboardIcon';
+import { DownloadIcon } from './icons/DownloadIcon';
+import * as XLSX from 'xlsx';
 
 interface ResultsDisplayProps {
   scenarios: ScenarioResult[];
@@ -22,6 +23,7 @@ const ResultsDisplay: React.FC<ResultsDisplayProps> = ({
   setCopyAction
  }) => {
   const [isCopied, setIsCopied] = useState(false);
+  const [isExporting, setIsExporting] = useState(false);
 
   if (scenarios.length === 0) {
     return null;
@@ -55,6 +57,48 @@ const ResultsDisplay: React.FC<ResultsDisplayProps> = ({
     }
   };
 
+  const handleExportXLSX = () => {
+    if (isExporting) return;
+    setIsExporting(true);
+    
+    try {
+      const dataForSheet = scenarios.map(scenario => {
+        const formattedGherkin = scenario.gherkin
+          .replace(/Escenario: .*\n\n/i, '')
+          .trim();
+        const formattedCriteria = scenario.criteria.map(c => `• ${c}`).join('\n');
+
+        return {
+          'Escenario': scenario.title,
+          'Pasos': formattedGherkin,
+          'Criterios de aceptacion': formattedCriteria,
+          'Resultados': '',
+          'Observaciones': ''
+        };
+      });
+
+      const worksheet = XLSX.utils.json_to_sheet(dataForSheet);
+
+      worksheet['!cols'] = [
+        { wch: 40 }, // Escenario
+        { wch: 60 }, // Pasos
+        { wch: 60 }, // Criterios de aceptacion
+        { wch: 30 }, // Resultados
+        { wch: 40 }  // Observaciones
+      ];
+
+      const workbook = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(workbook, worksheet, 'Casos de Prueba');
+      
+      XLSX.writeFile(workbook, 'matriz_de_pruebas_qa.xlsx');
+
+    } catch (error) {
+      console.error("Failed to export XLSX file:", error);
+    } finally {
+      setIsExporting(false);
+    }
+  };
+
   return (
     <div className="mt-8 space-y-6">
       <div className="flex justify-between items-center border-b-2 border-slate-700 pb-2">
@@ -62,7 +106,16 @@ const ResultsDisplay: React.FC<ResultsDisplayProps> = ({
           Escenarios Generados ({scenarios.length})
         </h2>
         <div className="flex items-center gap-2">
-           <button
+          <button
+            onClick={handleExportXLSX}
+            disabled={isExporting}
+            className="flex items-center gap-2 px-3 py-2 text-sm font-semibold text-emerald-300 bg-emerald-900/50 border border-brand-secondary rounded-lg hover:bg-emerald-800/70 disabled:opacity-50 disabled:cursor-wait transition-colors duration-200"
+            aria-label="Exportar a XLSX"
+          >
+            <DownloadIcon className="w-4 h-4" />
+            <span>{isExporting ? 'Exportando...' : 'Exportar XLSX'}</span>
+          </button>
+          <button
             onClick={handleCopyAll}
             className="flex items-center gap-2 px-3 py-2 text-sm font-semibold text-cyan-300 bg-cyan-900/50 border border-brand-primary rounded-lg hover:bg-cyan-800/70 transition-colors duration-200"
             aria-label="Copiar todos los escenarios"

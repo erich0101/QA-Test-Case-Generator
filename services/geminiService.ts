@@ -1,49 +1,68 @@
 
 import { GoogleGenAI } from "@google/genai";
-import { SYSTEM_PROMPT } from '../constants';
-import { RawScenario, ImageAttachment } from '../types';
+import { SYSTEM_PROMPT, API_CURL_TEST_PROMPT } from '../constants';
+import { RawScenario, ImageAttachment, ApiScenario } from '../types';
 
-export async function generateTestScenarios(
-  userStory: string,
+type Mode = 'e2e' | 'api';
+
+export async function generateScenarios(
+  mode: Mode,
+  promptText: string,
   apiKey: string,
-  images: ImageAttachment[]
-): Promise<RawScenario[]> {
+  images: ImageAttachment[] = []
+): Promise<RawScenario[] | ApiScenario[]> {
   if (!apiKey) {
     throw new Error("API Key is required. Please add your Gemini API key to proceed.");
   }
 
   const ai = new GoogleGenAI({ apiKey });
 
-  const taskPrompt = `
-    **TAREA:**
-    Analiza la siguiente historia de usuario/documento funcional y/o imagen(es) y genera una lista COMPLETA de escenarios de prueba.
-    
-    **HISTORIA DE USUARIO / DOCUMENTO FUNCIONAL A ANALIZAR:**
-    \`\`\`
-    ${userStory || '(No hay texto, basarse principalmente en la(s) imagen(es) adjunta(s) si existe(n))'}
-    \`\`\`
-  `;
+  const systemInstruction = mode === 'e2e' ? SYSTEM_PROMPT : API_CURL_TEST_PROMPT;
+  const contents: any[] = [];
+  let taskPrompt = '';
 
-  const contents = [];
-  contents.push({ text: taskPrompt });
+  if (mode === 'e2e') {
+    taskPrompt = `
+      **TAREA:**
+      Analiza la siguiente historia de usuario/documento funcional y/o imagen(es) y genera una lista COMPLETA de escenarios de prueba.
+      
+      **HISTORIA DE USUARIO / DOCUMENTO FUNCIONAL A ANALIZAR:**
+      \`\`\`
+      ${promptText || '(No hay texto, basarse principalmente en la(s) imagen(es) adjunta(s) si existe(n))'}
+      \`\`\`
+    `;
+    contents.push({ text: taskPrompt });
 
-  if (images && images.length > 0) {
-    images.forEach(image => {
-        contents.push({
-        inlineData: {
-            mimeType: image.mimeType,
-            data: image.data,
-        },
-        });
-    });
+    if (images.length > 0) {
+      images.forEach(image => {
+          contents.push({
+          inlineData: {
+              mimeType: image.mimeType,
+              data: image.data,
+          },
+          });
+      });
+    }
+  } else { // mode === 'api'
+      taskPrompt = `
+      **TAREA:**
+      Analiza el siguiente comando cURL y genera los escenarios de prueba para Postman.
+      
+      **COMANDO cURL A ANALIZAR:**
+      \`\`\`
+      ${promptText}
+      \`\`\`
+    `;
+    contents.push({ text: taskPrompt });
   }
+
 
   try {
     const response = await ai.models.generateContent({
       model: 'gemini-2.5-flash-preview-04-17',
       contents: { parts: contents },
       config: {
-        systemInstruction: SYSTEM_PROMPT,
+        systemInstruction: systemInstruction,
         responseMimeType: 'application/json',
         temperature: 0.2,
       },
@@ -67,12 +86,13 @@ export async function generateTestScenarios(
       throw new Error('La respuesta de la API no es un array JSON.');
     }
 
-    return parsedData as RawScenario[];
+    // El tipo de retorno real se valida mediante guardias de tipo en App.tsx
+    return parsedData as any;
 
   } catch (error) {
     console.error("Error llamando a la API de Gemini:", error);
     if (error instanceof Error) {
-      throw new Error(`Fallo al generar escenarios de prueba: ${error.message}`);
+      throw new Error(`Fallo al generar escenarios: ${error.message}`);
     }
     throw new Error("Ocurrió un error desconocido al comunicarse con la API.");
   }

@@ -1,8 +1,10 @@
+
 import React, { useState, useCallback, useEffect } from 'react';
-import { RawScenario, ScenarioResult, ImageAttachment } from './types';
-import { generateTestScenarios } from './services/geminiService';
+import { RawScenario, ScenarioResult, ImageAttachment, ApiScenario, ApiScenarioResult } from './types';
+import { generateScenarios } from './services/geminiService';
 import InputCard from './components/InputCard';
 import ResultsDisplay from './components/ResultsDisplay';
+import ApiResultsDisplay from './components/ApiResultsDisplay';
 import { SparklesIcon } from './components/icons/SparklesIcon';
 import ApiKeyManager from './components/ApiKeyManager';
 import { LinkedInIcon } from './components/icons/LinkedInIcon';
@@ -11,11 +13,34 @@ import InfoModal from './components/InfoModal';
 import { QuestionMarkCircleIcon } from './components/icons/QuestionMarkCircleIcon';
 import AlreadyCopiedModal from './components/AlreadyCopiedModal';
 import { encrypt, decrypt } from './services/secureStore';
+import ModeSelector from './components/ModeSelector';
+import ApiInputCard from './components/ApiInputCard';
+
+
+type AppMode = 'e2e' | 'api';
+
+// Type guards
+function isRawScenarioArray(data: any): data is RawScenario[] {
+    return Array.isArray(data) && (data.length === 0 || ('title' in data[0] && 'gherkin' in data[0] && 'acceptanceCriteria' in data[0]));
+}
+function isApiScenarioArray(data: any): data is ApiScenario[] {
+    return Array.isArray(data) && (data.length === 0 || ('title' in data[0] && 'gherkin' in data[0] && 'method' in data[0]));
+}
+
 
 function App() {
+  const [mode, setMode] = useState<AppMode>('e2e');
+  
+  // E2E state
   const [userInput, setUserInput] = useState<string>('');
   const [images, setImages] = useState<ImageAttachment[]>([]);
   const [scenarios, setScenarios] = useState<ScenarioResult[]>([]);
+  
+  // API state
+  const [curlInput, setCurlInput] = useState<string>('');
+  const [apiScenarios, setApiScenarios] = useState<ApiScenarioResult[]>([]);
+
+  // Common state
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
   const [apiKey, setApiKey] = useState<string>('');
@@ -46,33 +71,61 @@ function App() {
   };
 
   const handleGenerate = useCallback(async () => {
-    if ((!userInput.trim() && images.length === 0) || isLoading || !apiKey) return;
+    const isE2EMode = mode === 'e2e';
+    const isApiMode = mode === 'api';
+
+    if (isLoading || !apiKey) return;
+    if (isE2EMode && !userInput.trim() && images.length === 0) return;
+    if (isApiMode && !curlInput.trim()) return;
 
     setIsLoading(true);
     setError(null);
 
     try {
-      const result: RawScenario[] = await generateTestScenarios(userInput, apiKey, images);
-      const newScenarios: ScenarioResult[] = result.map((scenario, index) => ({
-        id: `${Date.now()}-${index}`,
-        title: scenario.title,
-        gherkin: scenario.gherkin,
-        criteria: scenario.acceptanceCriteria,
-      }));
-      setScenarios(prevScenarios => [...prevScenarios, ...newScenarios]);
+      if (isE2EMode) {
+        const result = await generateScenarios('e2e', userInput, apiKey, images);
+        if (isRawScenarioArray(result)) {
+            const newScenarios: ScenarioResult[] = result.map((scenario, index) => ({
+                id: `${Date.now()}-${index}`,
+                title: scenario.title,
+                gherkin: scenario.gherkin,
+                criteria: scenario.acceptanceCriteria,
+            }));
+            setScenarios(prevScenarios => [...prevScenarios, ...newScenarios]);
+        } else {
+            throw new Error('La API devolvió un tipo de datos inesperado para el modo E2E.');
+        }
+
+      } else { // API Mode
+        const result = await generateScenarios('api', curlInput, apiKey);
+        if (isApiScenarioArray(result)) {
+            const newApiScenarios: ApiScenarioResult[] = result.map((scenario, index) => ({
+                ...scenario,
+                id: `${Date.now()}-${index}`,
+            }));
+            setApiScenarios(prevScenarios => [...prevScenarios, ...newApiScenarios]);
+        } else {
+            throw new Error('La API devolvió un tipo de datos inesperado para el modo API.');
+        }
+      }
     } catch (e) {
       console.error(e);
       setError(e instanceof Error ? e.message : 'An unknown error occurred. Please check the console.');
     } finally {
       setIsLoading(false);
     }
-  }, [userInput, isLoading, apiKey, images]);
+  }, [mode, userInput, curlInput, isLoading, apiKey, images]);
 
   const handleClear = useCallback(() => {
+    // E2E
     setScenarios([]);
     setError(null);
     setImages([]);
     setUserInput('');
+    // API
+    setApiScenarios([]);
+    setCurlInput('');
+    // Common
     setCopiedScenarioIds([]); // Reset copied tracker
   }, []);
   
@@ -99,15 +152,17 @@ function App() {
             </h1>
           </div>
           <p className="text-slate-400">
-            Powered by Gemini, este asistente le ayuda a crear escenarios de prueba completos a partir de historias de usuarios.
+            Powered by Gemini, este asistente le ayuda a crear escenarios de prueba completos.
           </p>
         </header>
 
         <div className="space-y-6">
           <ApiKeyManager apiKey={apiKey} onApiKeyChange={handleApiKeyChange} />
           
-          <div className="flex flex-col items-center">
-            <InputCard
+          <ModeSelector mode={mode} setMode={setMode} />
+
+          {mode === 'e2e' ? (
+             <InputCard
               userInput={userInput}
               setUserInput={setUserInput}
               onGenerate={handleGenerate}
@@ -117,6 +172,17 @@ function App() {
               setImages={setImages}
               onInvalidFileType={handleInvalidFileType}
             />
+          ) : (
+            <ApiInputCard
+              curlInput={curlInput}
+              setCurlInput={setCurlInput}
+              onGenerate={handleGenerate}
+              isLoading={isLoading}
+              apiKey={apiKey}
+            />
+          )}
+
+          <div className="flex flex-col items-center">
             <button
               onClick={() => setShowInfoModal(true)}
               className="flex items-center gap-2 mt-4 text-sm text-yellow-400"
@@ -135,14 +201,23 @@ function App() {
           </div>
         )}
 
-        <ResultsDisplay 
-          scenarios={scenarios} 
-          onClear={handleClear}
-          copiedScenarioIds={copiedScenarioIds}
-          setCopiedScenarioIds={setCopiedScenarioIds}
-          setShowCopyWarningModal={setShowCopyWarningModal}
-          setCopyAction={setCopyAction}
-        />
+        {scenarios.length > 0 && (
+          <ResultsDisplay 
+            scenarios={scenarios} 
+            onClear={handleClear}
+            copiedScenarioIds={copiedScenarioIds}
+            setCopiedScenarioIds={setCopiedScenarioIds}
+            setShowCopyWarningModal={setShowCopyWarningModal}
+            setCopyAction={setCopyAction}
+          />
+        )}
+        
+        {apiScenarios.length > 0 && (
+          <ApiResultsDisplay
+            scenarios={apiScenarios}
+            onClear={handleClear}
+          />
+        )}
       </main>
       <footer className="text-center mt-12 text-slate-500 text-sm">
         <div className="flex justify-center items-center gap-2 mb-2">

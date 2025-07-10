@@ -1,6 +1,6 @@
 
 import React, { useState, useCallback, useEffect } from 'react';
-import { RawScenario, ScenarioResult, ImageAttachment, ApiScenario, ApiScenarioResult } from './types';
+import { RawScenario, ScenarioResult, ImageAttachment, ApiScenario, ApiScenarioResult, E2EHistoryItem, ApiHistoryItem } from './types';
 import { generateScenarios } from './services/geminiService';
 import InputCard from './components/InputCard';
 import ResultsDisplay from './components/ResultsDisplay';
@@ -16,9 +16,17 @@ import AlreadyCopiedModal from './components/AlreadyCopiedModal';
 import { encrypt, decrypt } from './services/secureStore';
 import ModeSelector from './components/ModeSelector';
 import ApiInputCard from './components/ApiInputCard';
+import HistoryManager from './components/HistoryManager';
+import HistoryPanel from './components/HistoryPanel';
 
 
 type AppMode = 'e2e' | 'api';
+
+// localStorage keys
+const HISTORY_ENABLED_KEY = 'history_enabled';
+const E2E_HISTORY_KEY = 'e2e_history';
+const API_HISTORY_KEY = 'api_history';
+
 
 // Type guards
 function isRawScenarioArray(data: any): data is RawScenario[] {
@@ -41,6 +49,11 @@ function App() {
   const [curlInput, setCurlInput] = useState<string>('');
   const [apiScenarios, setApiScenarios] = useState<ApiScenarioResult[]>([]);
 
+  // History state
+  const [isHistoryEnabled, setIsHistoryEnabled] = useState<boolean>(false);
+  const [e2eHistory, setE2eHistory] = useState<E2EHistoryItem[]>([]);
+  const [apiHistory, setApiHistory] = useState<ApiHistoryItem[]>([]);
+
   // Common state
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
@@ -53,13 +66,41 @@ function App() {
 
 
   useEffect(() => {
-    // Carga y descifra la clave de API del almacenamiento local en el renderizado inicial
+    // Load API Key
     const storedApiKey = localStorage.getItem('gemini_api_key');
     if (storedApiKey) {
       const decryptedKey = decrypt(storedApiKey);
       setApiKey(decryptedKey);
     }
+
+    // Load history settings and data
+    try {
+        const historyEnabled = localStorage.getItem(HISTORY_ENABLED_KEY);
+        setIsHistoryEnabled(historyEnabled ? JSON.parse(historyEnabled) : false);
+
+        const storedE2EHistory = localStorage.getItem(E2E_HISTORY_KEY);
+        setE2eHistory(storedE2EHistory ? JSON.parse(storedE2EHistory) : []);
+
+        const storedApiHistory = localStorage.getItem(API_HISTORY_KEY);
+        setApiHistory(storedApiHistory ? JSON.parse(storedApiHistory) : []);
+    } catch (e) {
+        console.error("Failed to load history from localStorage", e);
+    }
   }, []);
+
+  // Sync history state with localStorage
+  useEffect(() => {
+    localStorage.setItem(HISTORY_ENABLED_KEY, JSON.stringify(isHistoryEnabled));
+  }, [isHistoryEnabled]);
+  
+  useEffect(() => {
+    localStorage.setItem(E2E_HISTORY_KEY, JSON.stringify(e2eHistory));
+  }, [e2eHistory]);
+
+  useEffect(() => {
+    localStorage.setItem(API_HISTORY_KEY, JSON.stringify(apiHistory));
+  }, [apiHistory]);
+
 
   const handleApiKeyChange = (newKey: string) => {
     setApiKey(newKey);
@@ -93,6 +134,16 @@ function App() {
                 criteria: scenario.acceptanceCriteria,
             }));
             setScenarios(prevScenarios => [...prevScenarios, ...newScenarios]);
+            if (isHistoryEnabled) {
+                const historyItem: E2EHistoryItem = {
+                    id: `hist-e2e-${Date.now()}`,
+                    timestamp: Date.now(),
+                    userInput: userInput,
+                    images: images,
+                    scenarios: newScenarios
+                };
+                setE2eHistory(prev => [historyItem, ...prev]);
+            }
         } else {
             throw new Error('La API devolvió un tipo de datos inesperado para el modo E2E.');
         }
@@ -105,6 +156,15 @@ function App() {
                 id: `${Date.now()}-${index}`,
             }));
             setApiScenarios(prevScenarios => [...prevScenarios, ...newApiScenarios]);
+             if (isHistoryEnabled) {
+                const historyItem: ApiHistoryItem = {
+                    id: `hist-api-${Date.now()}`,
+                    timestamp: Date.now(),
+                    curlInput: curlInput,
+                    scenarios: newApiScenarios
+                };
+                setApiHistory(prev => [historyItem, ...prev]);
+            }
         } else {
             throw new Error('La API devolvió un tipo de datos inesperado para el modo API.');
         }
@@ -115,7 +175,7 @@ function App() {
     } finally {
       setIsLoading(false);
     }
-  }, [mode, userInput, curlInput, isLoading, apiKey, images]);
+  }, [mode, userInput, curlInput, isLoading, apiKey, images, isHistoryEnabled]);
 
   const handleClear = useCallback(() => {
     // E2E
@@ -129,6 +189,39 @@ function App() {
     // Common
     setCopiedScenarioIds([]); // Reset copied tracker
   }, []);
+
+  const handleToggleHistory = (enabled: boolean) => {
+    setIsHistoryEnabled(enabled);
+  };
+
+  const handleClearHistory = () => {
+    if (mode === 'e2e') {
+        setE2eHistory([]);
+    } else {
+        setApiHistory([]);
+    }
+  };
+
+  const handleLoadHistoryItem = (item: E2EHistoryItem | ApiHistoryItem) => {
+    if (mode === 'e2e' && 'userInput' in item) {
+        setUserInput(item.userInput);
+        setImages(item.images);
+        setScenarios(item.scenarios);
+        setCopiedScenarioIds([]);
+    } else if (mode === 'api' && 'curlInput' in item) {
+        setCurlInput(item.curlInput);
+        setApiScenarios(item.scenarios);
+    }
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+  
+  const handleDeleteHistoryItem = (id: string) => {
+    if (mode === 'e2e') {
+        setE2eHistory(prev => prev.filter(item => item.id !== id));
+    } else {
+        setApiHistory(prev => prev.filter(item => item.id !== id));
+    }
+  };
   
   const handleInvalidFileType = () => {
     setShowInvalidFileModal(true);
@@ -141,6 +234,8 @@ function App() {
     setShowCopyWarningModal(false);
     setCopyAction(null);
   };
+
+  const currentHistory = mode === 'e2e' ? e2eHistory : apiHistory;
 
   return (
     <div className="min-h-screen bg-slate-900 font-sans p-4 sm:p-6 lg:p-8">
@@ -159,6 +254,12 @@ function App() {
 
         <div className="space-y-6">
           <ApiKeyManager apiKey={apiKey} onApiKeyChange={handleApiKeyChange} />
+          <HistoryManager
+            isEnabled={isHistoryEnabled}
+            onToggle={handleToggleHistory}
+            onClearHistory={handleClearHistory}
+            historyCount={currentHistory.length}
+          />
           
           <ModeSelector mode={mode} setMode={setMode} />
 
@@ -219,9 +320,16 @@ function App() {
             onClear={handleClear}
           />
         )}
+
+        <HistoryPanel 
+            history={currentHistory}
+            onLoadItem={handleLoadHistoryItem}
+            onDeleteItem={handleDeleteHistoryItem}
+        />
+
       </main>
       <footer className="text-center mt-12 text-slate-500 text-sm">
-        <div className="flex justify-center items-center gap-3 mb-2">
+        <div className="flex justify-center items-center gap-2 mb-2">
           <span>Created by Erich Petrocelli</span>
           <a 
             href="https://www.linkedin.com/in/erichpetrocelli/" 
@@ -230,7 +338,7 @@ function App() {
             aria-label="Erich Petrocelli's LinkedIn Profile" 
             className="text-slate-400 hover:opacity-80 transition-opacity"
           >
-            <LinkedInIcon className="w-7 h-7" />
+           <LinkedInIcon className="w-7 h-7" />
           </a>
           <a 
             href="https://github.com/erich0101/QA-Test-Case-Generator" 

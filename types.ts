@@ -34,3 +34,18 @@ export interface ApiScenario {
 export interface ApiScenarioResult extends ApiScenario {
   id: string;
 }
+
+export interface E2EHistoryItem {
+  id: string;
+  timestamp: number;
+  userInput: string;
+  images: ImageAttachment[];
+  scenarios: ScenarioResult[];
+}
+
+export interface ApiHistoryItem {
+  id: string;
+  timestamp: number;
+  curlInput: string;
+  scenarios: ApiScenarioResult[];
+}

@@ -318,6 +318,7 @@ function App() {
           <ApiResultsDisplay
             scenarios={apiScenarios}
             onClear={handleClear}
+            curlInput={curlInput}
           />
         )}
 

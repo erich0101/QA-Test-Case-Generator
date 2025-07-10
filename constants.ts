@@ -129,6 +129,20 @@ A partir del \`curl\` proporcionado, generá:
 
 ---
 
+## ⚙️ Reglas para el \`body\`
+- Si el "Content-Type" es \`application/json\`, el campo \`body\` DEBE ser un objeto JSON válido.
+- Si el "Content-Type" es \`multipart/form-data\`, el campo \`body\` DEBE ser un objeto JSON que represente los pares clave-valor de los campos del formulario. Extrae los campos del comando cURL (usualmente de los argumentos -F). Ejemplo: para \`-F 'name=test' -F 'file=@/path/to/img.png'\`, el body debe ser \`{ "name": "test", "file": "@/path/to/img.png" }\`.
+- Si la petición no tiene cuerpo (ej. GET), el campo \`body\` debe ser un objeto JSON vacío: \`{}\`.
+
+---
+
+## ⚙️ Reglas para los \`headers\`
+- **IMPORTANTE**: El header \`Content-Type\` es obligatorio y DEBES incluirlo siempre en el objeto \`headers\`.
+- Debes deducir el \`Content-Type\` correcto del comando cURL. Por ejemplo, si el cURL usa \`-d\` con datos JSON, el \`Content-Type\` debe ser \`application/json\`. Si usa \`--form\` o \`-F\`, debe ser \`multipart/form-data\`.
+- **NUNCA omitas el header \`Content-Type\`**.
+
+---
+
 ## 🧪 Buenas prácticas esperadas
 
 - Usar **variables del entorno** siempre (\`{{token}}\`, \`{{usuario_valido}}\`, etc.)

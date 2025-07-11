@@ -351,7 +351,7 @@ function App() {
             <GithubIcon className="w-6 h-6" />
           </a>
         </div>
-        <p className="text-slate-600 mt-1">API Key is stored encrypted in your browser's local storage.</p>
+        <p className="text-slate-600 mt-1">La clave API se almacena cifrada en el almacenamiento local de su navegador..</p>
       </footer>
       
       <InvalidFileModal 

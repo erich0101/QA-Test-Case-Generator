@@ -121,14 +121,14 @@ const ResultsDisplay: React.FC<ResultsDisplayProps> = ({
             aria-label="Copiar todos los escenarios"
           >
             <ClipboardIcon className="w-4 h-4" />
-            <span>{isCopied ? 'All Copied!' : 'Copy All'}</span>
+            <span>{isCopied ? 'All Copied!' : 'Copiar todos'}</span>
           </button>
           <button
             onClick={onClear}
             className="px-4 py-2 text-sm font-semibold text-rose-300 bg-rose-900/50 border border-brand-danger rounded-lg hover:bg-rose-800/70 transition-colors duration-200"
             aria-label="Borra todos los escenarios"
           >
-            Clear All
+            Borrar todos
           </button>
         </div>
       </div>

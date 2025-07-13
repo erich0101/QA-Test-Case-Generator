@@ -1,5 +1,4 @@
-
-import React, { useState, useCallback, useEffect } from 'react';
+import React, { useState, useCallback, useEffect, useRef } from 'react';
 import { RawScenario, ScenarioResult, ImageAttachment, ApiScenario, ApiScenarioResult, E2EHistoryItem, ApiHistoryItem } from './types';
 import { generateScenarios } from './services/geminiService';
 import InputCard from './components/InputCard';
@@ -63,6 +62,8 @@ function App() {
   const [copiedScenarioIds, setCopiedScenarioIds] = useState<string[]>([]);
   const [showCopyWarningModal, setShowCopyWarningModal] = useState(false);
   const [copyAction, setCopyAction] = useState<(() => void) | null>(null);
+
+  const historyPanelRef = useRef<HTMLDivElement>(null);
 
 
   useEffect(() => {
@@ -223,6 +224,10 @@ function App() {
     }
   };
   
+  const handleGoToHistory = () => {
+    historyPanelRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  };
+
   const handleInvalidFileType = () => {
     setShowInvalidFileModal(true);
   };
@@ -258,6 +263,7 @@ function App() {
             isEnabled={isHistoryEnabled}
             onToggle={handleToggleHistory}
             onClearHistory={handleClearHistory}
+            onGoToHistory={handleGoToHistory}
             historyCount={currentHistory.length}
           />
           
@@ -323,6 +329,7 @@ function App() {
         )}
 
         <HistoryPanel 
+            ref={historyPanelRef}
             history={currentHistory}
             onLoadItem={handleLoadHistoryItem}
             onDeleteItem={handleDeleteHistoryItem}

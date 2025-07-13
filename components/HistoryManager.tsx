@@ -3,15 +3,17 @@ import React from 'react';
 import { HistoryIcon } from './icons/HistoryIcon';
 import { TrashIcon } from './icons/TrashIcon';
 import { InfoIcon } from './icons/InfoIcon';
+import { GoToIcon } from './icons/GoToIcon';
 
 interface HistoryManagerProps {
   isEnabled: boolean;
   onToggle: (enabled: boolean) => void;
   onClearHistory: () => void;
+  onGoToHistory: () => void;
   historyCount: number;
 }
 
-const HistoryManager: React.FC<HistoryManagerProps> = ({ isEnabled, onToggle, onClearHistory, historyCount }) => {
+const HistoryManager: React.FC<HistoryManagerProps> = ({ isEnabled, onToggle, onClearHistory, onGoToHistory, historyCount }) => {
   return (
     <div className="bg-slate-800/60 p-4 rounded-xl shadow-md border border-slate-700 space-y-3">
       <div className="flex flex-col sm:flex-row items-center justify-between gap-4 w-full">
@@ -21,14 +23,24 @@ const HistoryManager: React.FC<HistoryManagerProps> = ({ isEnabled, onToggle, on
         </div>
         <div className="flex items-center gap-4">
           {historyCount > 0 && (
-            <button
-              onClick={onClearHistory}
-              className="flex items-center gap-2 px-3 py-1.5 text-sm font-semibold text-rose-400 hover:text-rose-300 disabled:opacity-50"
-              aria-label="Clear history"
-            >
-              <TrashIcon className="w-4 h-4" />
-              <span>Borrar Historial ({historyCount})</span>
-            </button>
+            <>
+              <button
+                onClick={onGoToHistory}
+                className="flex items-center gap-2 px-3 py-1.5 text-sm font-semibold text-cyan-400 hover:text-cyan-300 disabled:opacity-50"
+                aria-label="Go to history panel"
+              >
+                <GoToIcon className="w-4 h-4" />
+                <span>Ver Historial</span>
+              </button>
+              <button
+                onClick={onClearHistory}
+                className="flex items-center gap-2 px-3 py-1.5 text-sm font-semibold text-rose-400 hover:text-rose-300 disabled:opacity-50"
+                aria-label="Clear history"
+              >
+                <TrashIcon className="w-4 h-4" />
+                <span>Borrar Historial ({historyCount})</span>
+              </button>
+            </>
           )}
           <div className="flex items-center gap-2">
             <span className={`text-sm font-medium ${isEnabled ? 'text-slate-200' : 'text-slate-400'}`}>

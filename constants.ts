@@ -225,11 +225,15 @@ Evalúa la historia de usuario para identificar los siguientes puntos:
   - ¿Se omiten restricciones, condiciones o criterios específicos que deben cumplirse?
   - ¿Hay supuestos no declarados que podrían afectar la lógica de negocio?
 
+6. **Contradicciones**:
+  - ¿Hay afirmaciones que se contradicen entre sí dentro de la historia?
+  - ¿Se presentan requisitos que no pueden coexistir?
+
 ---
 
 ## 🧱 Formato de Salida Esperado
 
-Presenta tu análisis en una sección llamada \`## 🧱 Problemas Detectados\`, siguiendo este formato:
+Presenta tu análisis en una sección llamada \`## 🧱 Problemas Detectados\`, siguiendo este formato de ejemplo:
 
 \`\`\`markdown
 ## 🧱 Problemas Detectados

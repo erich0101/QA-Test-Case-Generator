@@ -1,5 +1,6 @@
+
 import { GoogleGenAI } from "@google/genai";
-import { SYSTEM_PROMPT, API_CURL_TEST_PROMPT } from '../constants';
+import { SYSTEM_PROMPT, API_CURL_TEST_PROMPT, USER_STORY_ANALYSIS_PROMPT } from '../constants';
 import { RawScenario, ImageAttachment, ApiScenario } from '../types';
 
 type Mode = 'e2e' | 'api';
@@ -58,7 +59,7 @@ export async function generateScenarios(
 
   try {
     const response = await ai.models.generateContent({
-      model: 'gemini-2.5-flash-lite-preview-06-17',
+      model: 'gemini-2.5-flash',
       contents: { parts: contents },
       config: {
         systemInstruction: systemInstruction,
@@ -73,18 +74,10 @@ export async function generateScenarios(
       throw new Error('La respuesta de la API estaba vacía.');
     }
 
-    // Nueva lógica para extraer solo el JSON entre [ y ]
-    const arrayRegex = /^[^[]*\[([\s\S]*?)\][^]]*$/;
-    const arrayMatch = jsonStr.match(arrayRegex);
-    if (arrayMatch && arrayMatch[1] !== undefined) {
-      jsonStr = `[${arrayMatch[1].trim()}]`;
-    } else {
-      // Si no se encuentra un array, intentamos con la regex original de cerca
-      const fenceRegex = /^```(\w*)?\s*\n?(.*?)\n?\s*```$/s;
-      const match = jsonStr.match(fenceRegex);
-      if (match && match[2]) {
-        jsonStr = match[2].trim();
-      }
+    const fenceRegex = /^```(\w*)?\s*\n?(.*?)\n?\s*```$/s;
+    const match = jsonStr.match(fenceRegex);
+    if (match && match[2]) {
+      jsonStr = match[2].trim();
     }
 
     const parsedData = JSON.parse(jsonStr);
@@ -103,4 +96,55 @@ export async function generateScenarios(
     }
     throw new Error("Ocurrió un error desconocido al comunicarse con la API.");
   }
+}
+
+export async function analyzeUserStory(
+  promptText: string,
+  apiKey: string,
+  images: ImageAttachment[] = []
+): Promise<string> {
+  if (!apiKey) {
+    throw new Error("API Key is required.");
+  }
+  const ai = new GoogleGenAI({ apiKey });
+  
+  const contents: any[] = [];
+  const taskPrompt = `
+      **HISTORIA DE USUARIO / DOCUMENTO FUNCIONAL A ANALIZAR:**
+      \`\`\`
+      ${promptText || '(No hay texto, basarse principalmente en la(s) imagen(es) adjunta(s) si existe(n))'}
+      \`\`\`
+    `;
+    contents.push({ text: taskPrompt });
+
+    if (images.length > 0) {
+      images.forEach(image => {
+          contents.push({
+          inlineData: {
+              mimeType: image.mimeType,
+              data: image.data,
+          },
+          });
+      });
+    }
+
+    try {
+        const response = await ai.models.generateContent({
+            model: 'gemini-2.5-flash-lite-preview-06-17',
+            contents: { parts: contents },
+            config: {
+                systemInstruction: USER_STORY_ANALYSIS_PROMPT,
+                temperature: 0.3,
+            },
+        });
+
+        return response.text;
+
+    } catch (error) {
+        console.error("Error llamando a la API de Gemini para análisis:", error);
+        if (error instanceof Error) {
+            throw new Error(`Fallo al analizar la historia de usuario: ${error.message}`);
+        }
+        throw new Error("Ocurrió un error desconocido al comunicarse con la API para análisis.");
+    }
 }

@@ -192,3 +192,58 @@ A partir del \`curl\` proporcionado, generá:
 }
 \`\`\`
 `;
+
+
+export const USER_STORY_ANALYSIS_PROMPT = `
+# 🎯 Prompt para Evaluación Crítica de Historias de Usuario
+
+## 📌 Instrucciones para la IA
+
+A continuación se presenta una historia de usuario. Tu tarea es analizarla en profundidad y detectar cualquier problema que pueda comprometer su comprensión, implementación o validación. No generes casos de prueba. Concéntrate únicamente en el análisis crítico.
+
+Evalúa la historia de usuario para identificar los siguientes puntos:
+
+### 🔍 Tipos de Problemas a Detectar
+
+1. **Inconsistencias**:  
+  - ¿Hay afirmaciones que se contradicen entre sí o con el objetivo de la historia?
+  - ¿Se plantean comportamientos incompatibles?
+
+2. **Ambigüedades**:  
+  - ¿Existen términos o frases que pueden interpretarse de múltiples formas?
+  - ¿Se usan palabras como "fácil", "rápido", "eficiente" sin definición concreta?
+
+3. **Falta de claridad**:  
+  - ¿Está la historia escrita de forma genérica, sin elementos medibles o verificables?
+  - ¿Se entiende claramente qué se espera del sistema?
+
+4. **Falta de información esencial**:  
+  - ¿Faltan actores, acciones específicas, condiciones previas o resultados esperados?
+  - ¿Se omite el contexto o el flujo básico?
+
+5. **Falta o debilidad de reglas de negocio**:  
+  - ¿Se omiten restricciones, condiciones o criterios específicos que deben cumplirse?
+  - ¿Hay supuestos no declarados que podrían afectar la lógica de negocio?
+
+---
+
+## 🧱 Formato de Salida Esperado
+
+Presenta tu análisis en una sección llamada \`## 🧱 Problemas Detectados\`, siguiendo este formato:
+
+\`\`\`markdown
+## 🧱 Problemas Detectados
+
+1. **[Tipo de problema]**: [Descripción breve]
+  - 🔍 Explicación: [Explicación clara del problema]
+  - ✅ Sugerencia: [Mejora o pregunta que permitiría clarificar o resolver el problema]
+
+Ejemplo:
+
+## 🧱 Problemas Detectados
+
+1. **Ambigüedad**: “Iniciar sesión fácilmente”
+  - 🔍 Explicación: No se define qué significa “fácilmente”. Puede referirse al tiempo, pasos necesarios, o usabilidad.
+  - ✅ Sugerencia: Reemplazar por un criterio medible, como “con un solo campo de entrada” o “en menos de 3 segundos”.
+\`\`\`
+`;

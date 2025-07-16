@@ -41,6 +41,7 @@ export interface E2EHistoryItem {
   userInput: string;
   images: ImageAttachment[];
   scenarios: ScenarioResult[];
+  analysisResult?: string;
 }
 
 export interface ApiHistoryItem {

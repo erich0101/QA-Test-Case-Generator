@@ -1,6 +1,7 @@
+
 import React, { useState, useCallback, useEffect, useRef } from 'react';
 import { RawScenario, ScenarioResult, ImageAttachment, ApiScenario, ApiScenarioResult, E2EHistoryItem, ApiHistoryItem } from './types';
-import { generateScenarios } from './services/geminiService';
+import { generateScenarios, analyzeUserStory } from './services/geminiService';
 import InputCard from './components/InputCard';
 import ResultsDisplay from './components/ResultsDisplay';
 import ApiResultsDisplay from './components/ApiResultsDisplay';
@@ -17,6 +18,7 @@ import ModeSelector from './components/ModeSelector';
 import ApiInputCard from './components/ApiInputCard';
 import HistoryManager from './components/HistoryManager';
 import HistoryPanel from './components/HistoryPanel';
+import AnalysisDisplay from './components/AnalysisDisplay';
 
 
 type AppMode = 'e2e' | 'api';
@@ -43,7 +45,8 @@ function App() {
   const [userInput, setUserInput] = useState<string>('');
   const [images, setImages] = useState<ImageAttachment[]>([]);
   const [scenarios, setScenarios] = useState<ScenarioResult[]>([]);
-  
+  const [analysisResult, setAnalysisResult] = useState<string | null>(null);
+
   // API state
   const [curlInput, setCurlInput] = useState<string>('');
   const [apiScenarios, setApiScenarios] = useState<ApiScenarioResult[]>([]);
@@ -123,12 +126,21 @@ function App() {
 
     setIsLoading(true);
     setError(null);
+    if (isE2EMode) {
+        setAnalysisResult(null); // Clear previous analysis
+    }
 
     try {
       if (isE2EMode) {
-        const result = await generateScenarios('e2e', userInput, apiKey, images);
-        if (isRawScenarioArray(result)) {
-            const newScenarios: ScenarioResult[] = result.map((scenario, index) => ({
+        const [analysis, scenariosData] = await Promise.all([
+          analyzeUserStory(userInput, apiKey, images),
+          generateScenarios('e2e', userInput, apiKey, images)
+        ]);
+
+        setAnalysisResult(analysis);
+        
+        if (isRawScenarioArray(scenariosData)) {
+            const newScenarios: ScenarioResult[] = scenariosData.map((scenario, index) => ({
                 id: `${Date.now()}-${index}`,
                 title: scenario.title,
                 gherkin: scenario.gherkin,
@@ -141,7 +153,8 @@ function App() {
                     timestamp: Date.now(),
                     userInput: userInput,
                     images: images,
-                    scenarios: newScenarios
+                    scenarios: newScenarios,
+                    analysisResult: analysis
                 };
                 setE2eHistory(prev => [historyItem, ...prev]);
             }
@@ -184,6 +197,7 @@ function App() {
     setError(null);
     setImages([]);
     setUserInput('');
+    setAnalysisResult(null);
     // API
     setApiScenarios([]);
     setCurlInput('');
@@ -204,11 +218,12 @@ function App() {
   };
 
   const handleLoadHistoryItem = (item: E2EHistoryItem | ApiHistoryItem) => {
+    handleClear(); // Clear current state before loading
     if (mode === 'e2e' && 'userInput' in item) {
         setUserInput(item.userInput);
         setImages(item.images);
         setScenarios(item.scenarios);
-        setCopiedScenarioIds([]);
+        setAnalysisResult(item.analysisResult || null);
     } else if (mode === 'api' && 'curlInput' in item) {
         setCurlInput(item.curlInput);
         setApiScenarios(item.scenarios);
@@ -308,6 +323,10 @@ function App() {
             <p>{error}</p>
           </div>
         )}
+        
+        {mode === 'e2e' && analysisResult && (
+          <AnalysisDisplay markdownContent={analysisResult} />
+        )}
 
         {mode === 'e2e' && scenarios.length > 0 && (
           <ResultsDisplay 
@@ -358,7 +377,7 @@ function App() {
             <GithubIcon className="w-6 h-6" />
           </a>
         </div>
-        <p className="text-slate-600 mt-1">La clave API se almacena cifrada en el almacenamiento local de su navegador..</p>
+        <p className="text-slate-600 mt-1">API Key is stored encrypted in your browser's local storage.</p>
       </footer>
       
       <InvalidFileModal 

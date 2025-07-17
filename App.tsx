@@ -11,6 +11,7 @@ import { LinkedInIcon } from './components/icons/LinkedInIcon';
 import { GithubIcon } from './components/icons/GithubIcon';
 import InvalidFileModal from './components/InvalidFileModal';
 import InfoModal from './components/InfoModal';
+import InstructionsModal from './components/InstructionsModal';
 import { QuestionMarkCircleIcon } from './components/icons/QuestionMarkCircleIcon';
 import AlreadyCopiedModal from './components/AlreadyCopiedModal';
 import { encrypt, decrypt } from './services/secureStore';
@@ -19,6 +20,7 @@ import ApiInputCard from './components/ApiInputCard';
 import HistoryManager from './components/HistoryManager';
 import HistoryPanel from './components/HistoryPanel';
 import AnalysisDisplay from './components/AnalysisDisplay';
+import ApiInstructionsModal from './components/ApiInstructionsModal';
 
 
 type AppMode = 'e2e' | 'api';
@@ -62,6 +64,8 @@ function App() {
   const [apiKey, setApiKey] = useState<string>('');
   const [showInvalidFileModal, setShowInvalidFileModal] = useState(false);
   const [showInfoModal, setShowInfoModal] = useState(false);
+  const [showInstructionsModal, setShowInstructionsModal] = useState(false);
+  const [showApiInstructionsModal, setShowApiInstructionsModal] = useState(false);
   const [copiedScenarioIds, setCopiedScenarioIds] = useState<string[]>([]);
   const [showCopyWarningModal, setShowCopyWarningModal] = useState(false);
   const [copyAction, setCopyAction] = useState<(() => void) | null>(null);
@@ -294,6 +298,7 @@ function App() {
               images={images}
               setImages={setImages}
               onInvalidFileType={handleInvalidFileType}
+              onShowInstructions={() => setShowInstructionsModal(true)}
             />
           ) : (
             <ApiInputCard
@@ -302,6 +307,7 @@ function App() {
               onGenerate={handleGenerate}
               isLoading={isLoading}
               apiKey={apiKey}
+              onShowInstructions={() => setShowApiInstructionsModal(true)}
             />
           )}
 
@@ -387,6 +393,14 @@ function App() {
       <InfoModal
         isOpen={showInfoModal}
         onClose={() => setShowInfoModal(false)}
+      />
+      <InstructionsModal
+        isOpen={showInstructionsModal}
+        onClose={() => setShowInstructionsModal(false)}
+      />
+       <ApiInstructionsModal
+        isOpen={showApiInstructionsModal}
+        onClose={() => setShowApiInstructionsModal(false)}
       />
       <AlreadyCopiedModal
         isOpen={showCopyWarningModal}

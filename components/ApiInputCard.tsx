@@ -1,6 +1,7 @@
 
 import React from 'react';
 import { SparklesIcon } from './icons/SparklesIcon';
+import { CommandLineIcon } from './icons/CommandLineIcon';
 
 interface ApiInputCardProps {
   curlInput: string;
@@ -8,9 +9,10 @@ interface ApiInputCardProps {
   onGenerate: () => void;
   isLoading: boolean;
   apiKey: string;
+  onShowInstructions: () => void;
 }
 
-const ApiInputCard: React.FC<ApiInputCardProps> = ({ curlInput, setCurlInput, onGenerate, isLoading, apiKey }) => {
+const ApiInputCard: React.FC<ApiInputCardProps> = ({ curlInput, setCurlInput, onGenerate, isLoading, apiKey, onShowInstructions }) => {
   const isButtonDisabled = isLoading || !curlInput.trim() || !apiKey;
 
   return (
@@ -32,7 +34,17 @@ const ApiInputCard: React.FC<ApiInputCardProps> = ({ curlInput, setCurlInput, on
       <div className="text-right text-xs text-slate-500 mt-1 pr-1">
         {curlInput.length.toLocaleString()} caracteres
       </div>
-      <div className="mt-4 flex justify-end items-center gap-4">
+      <div className="mt-4 flex justify-between items-center gap-4">
+        <button
+          onClick={onShowInstructions}
+          disabled={isLoading}
+          className="flex items-center gap-2 text-base font-semibold text-yellow-400 hover:text-yellow-300 transition-colors disabled:opacity-50 disabled:cursor-wait"
+          aria-label="Cómo obtener el comando cURL"
+        >
+          <CommandLineIcon className="w-5 h-5" />
+          <span>Cómo obtener cURL</span>
+        </button>
+
         <button
           onClick={onGenerate}
           disabled={isButtonDisabled}

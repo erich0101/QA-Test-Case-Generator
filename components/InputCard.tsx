@@ -4,6 +4,7 @@ import { SparklesIcon } from './icons/SparklesIcon';
 import { PaperclipIcon } from './icons/PaperclipIcon';
 import { XCircleIcon } from './icons/XCircleIcon';
 import { ImageAttachment } from '../types';
+import { BookOpenIcon } from './icons/BookOpenIcon';
 
 interface InputCardProps {
   userInput: string;
@@ -14,9 +15,10 @@ interface InputCardProps {
   images: ImageAttachment[];
   setImages: (update: React.SetStateAction<ImageAttachment[]>) => void;
   onInvalidFileType: () => void;
+  onShowInstructions: () => void;
 }
 
-const InputCard: React.FC<InputCardProps> = ({ userInput, setUserInput, onGenerate, isLoading, apiKey, images, setImages, onInvalidFileType }) => {
+const InputCard: React.FC<InputCardProps> = ({ userInput, setUserInput, onGenerate, isLoading, apiKey, images, setImages, onInvalidFileType, onShowInstructions }) => {
   const isButtonDisabled = isLoading || (!userInput.trim() && images.length === 0) || !apiKey;
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -107,45 +109,57 @@ const InputCard: React.FC<InputCardProps> = ({ userInput, setUserInput, onGenera
       <div className="text-right text-xs text-slate-500 mt-1 pr-1">
         {userInput.length.toLocaleString()} caracteres
       </div>
-      <div className="mt-4 flex justify-end items-center gap-4">
-        <input
-            type="file"
-            ref={fileInputRef}
-            onChange={handleFileChange}
-            accept="image/*"
-            className="hidden"
-            multiple
-        />
+      <div className="mt-4 flex justify-between items-center gap-4">
         <button
-          onClick={() => fileInputRef.current?.click()}
-          disabled={isLoading || !apiKey}
-          className="flex items-center justify-center gap-2 px-4 py-3 bg-slate-700 text-slate-300 font-semibold rounded-lg shadow-md hover:bg-slate-600 disabled:bg-slate-600 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-300"
-          aria-label="Attach image"
+          onClick={onShowInstructions}
+          disabled={isLoading}
+          className="flex items-center gap-2 text-base font-semibold text-yellow-400 hover:text-yellow-300 transition-colors disabled:opacity-50 disabled:cursor-wait"
+          aria-label="Ver consejos de uso"
         >
-          <PaperclipIcon className="w-5 h-5" />
+          <BookOpenIcon className="w-5 h-5" />
+          <span>Consejos de uso</span>
         </button>
-        
-        <button
-          onClick={onGenerate}
-          disabled={isButtonDisabled}
-          className="flex items-center justify-center gap-2 px-6 py-3 bg-brand-primary text-white font-semibold rounded-lg shadow-md hover:bg-cyan-600 disabled:bg-slate-600 disabled:cursor-not-allowed transition-all duration-300 transform hover:scale-105 disabled:scale-100"
-          aria-label="Generar Escenarios"
-        >
-          {isLoading ? (
-            <>
-              <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-              </svg>
-              Generating...
-            </>
-          ) : (
-            <>
-              <SparklesIcon className="w-5 h-5" />
-              Generar Escenarios
-            </>
-          )}
-        </button>
+
+        <div className="flex items-center gap-4">
+            <input
+                type="file"
+                ref={fileInputRef}
+                onChange={handleFileChange}
+                accept="image/*"
+                className="hidden"
+                multiple
+            />
+            <button
+              onClick={() => fileInputRef.current?.click()}
+              disabled={isLoading || !apiKey}
+              className="flex items-center justify-center gap-2 px-4 py-3 bg-slate-700 text-slate-300 font-semibold rounded-lg shadow-md hover:bg-slate-600 disabled:bg-slate-600 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-300"
+              aria-label="Attach image"
+            >
+              <PaperclipIcon className="w-5 h-5" />
+            </button>
+            
+            <button
+              onClick={onGenerate}
+              disabled={isButtonDisabled}
+              className="flex items-center justify-center gap-2 px-6 py-3 bg-brand-primary text-white font-semibold rounded-lg shadow-md hover:bg-cyan-600 disabled:bg-slate-600 disabled:cursor-not-allowed transition-all duration-300 transform hover:scale-105 disabled:scale-100"
+              aria-label="Generar Escenarios"
+            >
+              {isLoading ? (
+                <>
+                  <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                  </svg>
+                  Generating...
+                </>
+              ) : (
+                <>
+                  <SparklesIcon className="w-5 h-5" />
+                  Generar Escenarios
+                </>
+              )}
+            </button>
+        </div>
       </div>
     </div>
   );

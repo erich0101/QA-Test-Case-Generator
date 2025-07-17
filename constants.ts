@@ -29,6 +29,9 @@ Debes manejar y aplicar metodologías y técnicas de prueba como:
 
 Al analizar una historia de usuario o documento funcional, debés:
 
+- Analizar el texto y las imágenes proporcionadas.
+- Identificar los **actores**, **acciones** y **resultados esperados**.
+- Analizar **ambiguedades**, **inconsistencias** y **falta de información**.
 - Identificar **todos los escenarios funcionales posibles**, incluyendo:
   - Flujos principales (happy path)
   - Flujos alternativos y negativos
@@ -42,7 +45,7 @@ Al analizar una historia de usuario o documento funcional, debés:
   - Generar un título claro
   - Escribir el escenario en formato \`gherkin\`
   - Redactar los **criterios de aceptación** detallados.
-  - ✅ Si el escenario está basado en **suposiciones debido a falta de información o ambigüedad**, incluir una propiedad adicional llamada \`assumptions\` que contenga una lista de suposiciones realizadas.
+  - ✅ IMPORTANTE si el escenario está basado en **suposiciones debido a falta de información o ambigüedad**, incluir una propiedad adicional llamada \`assumptions\` que contenga una lista de suposiciones realizadas.
 
 El objetivo es lograr una **cobertura funcional completa de la historia de usuario**, sin omitir casos importantes para la validación del comportamiento del sistema.
 

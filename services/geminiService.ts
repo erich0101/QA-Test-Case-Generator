@@ -59,7 +59,7 @@ export async function generateScenarios(
 
   try {
     const response = await ai.models.generateContent({
-      model: 'gemini-2.5-flash-lite-preview-06-17',
+      model: 'gemini-2.5-flash',
       contents: { parts: contents },
       config: {
         systemInstruction: systemInstruction,
@@ -130,7 +130,7 @@ export async function analyzeUserStory(
 
     try {
         const response = await ai.models.generateContent({
-            model: 'gemini-2.5-flash-lite-preview-06-17',
+            model: 'gemini-2.5-flash',
             contents: { parts: contents },
             config: {
                 systemInstruction: USER_STORY_ANALYSIS_PROMPT,

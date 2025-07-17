@@ -42,6 +42,7 @@ Al analizar una historia de usuario o documento funcional, debés:
   - Generar un título claro
   - Escribir el escenario en formato \`gherkin\`
   - Redactar los **criterios de aceptación** detallados.
+  - ✅ Si el escenario está basado en **suposiciones debido a falta de información o ambigüedad**, incluir una propiedad adicional llamada \`assumptions\` que contenga una lista de suposiciones realizadas.
 
 El objetivo es lograr una **cobertura funcional completa de la historia de usuario**, sin omitir casos importantes para la validación del comportamiento del sistema.
 
@@ -79,9 +80,15 @@ La estructura de cada objeto en el array debe ser la siguiente:
   "acceptanceCriteria": [
     "Un criterio de aceptación claro y verificable.",
     "Otro criterio de aceptación."
+  ],
+  "assumptions": [
+    "Suposición hecha debido a falta de detalle o ambigüedad.",
+    "Otra suposición si aplica."
   ]
 }
 \`\`\`
+
+**Nota:** La propiedad \`assumptions\` es opcional y **sólo debe incluirse si el escenario fue generado parcialmente con supuestos**.
 
 **Ejemplo de un array de respuesta válido con un solo escenario:**
 
@@ -94,6 +101,10 @@ La estructura de cada objeto en el array debe ser la siguiente:
       "El sistema debe mostrar un mensaje de error específico en cada campo obligatorio vacío.",
       "Los campos con error deben resaltarse visualmente (por ejemplo: borde rojo).",
       "El botón 'Guardar' debe estar deshabilitado o la acción debe ser impedida mientras haya errores."
+    ],
+    "assumptions": [
+      "Se asumió que 'Razón Social' y 'CUIT' son campos obligatorios porque no se especificó claramente.",
+      "Se asumió que el sistema impide guardar si hay errores visibles."
     ]
   }
 ]
@@ -193,7 +204,6 @@ A partir del \`curl\` proporcionado, generá:
 \`\`\`
 `;
 
-
 export const USER_STORY_ANALYSIS_PROMPT = `
 # 🎯 Prompt para Evaluación Crítica de Historias de Usuario
 
@@ -206,48 +216,44 @@ Evalúa la historia de usuario para identificar los siguientes puntos:
 ### 🔍 Tipos de Problemas a Detectar
 
 1. **Inconsistencias**:  
-  - ¿Hay afirmaciones que se contradicen entre sí o con el objetivo de la historia?
-  - ¿Se plantean comportamientos incompatibles?
+   - ¿Hay afirmaciones que se contradicen entre sí o con el objetivo de la historia?
+   - ¿Se plantean comportamientos incompatibles?
 
 2. **Ambigüedades**:  
-  - ¿Existen términos o frases que pueden interpretarse de múltiples formas?
-  - ¿Se usan palabras como "fácil", "rápido", "eficiente" sin definición concreta?
+   - ¿Existen términos o frases que pueden interpretarse de múltiples formas?
+   - ¿Se usan palabras como "fácil", "rápido", "eficiente" sin definición concreta?
 
 3. **Falta de claridad**:  
-  - ¿Está la historia escrita de forma genérica, sin elementos medibles o verificables?
-  - ¿Se entiende claramente qué se espera del sistema?
+   - ¿Está la historia escrita de forma genérica, sin elementos medibles o verificables?
+   - ¿Se entiende claramente qué se espera del sistema?
 
 4. **Falta de información esencial**:  
-  - ¿Faltan actores, acciones específicas, condiciones previas o resultados esperados?
-  - ¿Se omite el contexto o el flujo básico?
+   - ¿Faltan actores, acciones específicas, condiciones previas o resultados esperados?
+   - ¿Se omite el contexto o el flujo básico?
 
 5. **Falta o debilidad de reglas de negocio**:  
-  - ¿Se omiten restricciones, condiciones o criterios específicos que deben cumplirse?
-  - ¿Hay supuestos no declarados que podrían afectar la lógica de negocio?
-
-6. **Contradicciones**:
-  - ¿Hay afirmaciones que se contradicen entre sí dentro de la historia?
-  - ¿Se presentan requisitos que no pueden coexistir?
+   - ¿Se omiten restricciones, condiciones o criterios específicos que deben cumplirse?
+   - ¿Hay supuestos no declarados que podrían afectar la lógica de negocio?
 
 ---
 
 ## 🧱 Formato de Salida Esperado
 
-Presenta tu análisis en una sección llamada \`## 🧱 Problemas Detectados\`, siguiendo este formato de ejemplo:
+Presenta tu análisis en una sección llamada \`## 🧱 Problemas Detectados\`, siguiendo este formato:
 
 \`\`\`markdown
 ## 🧱 Problemas Detectados
 
 1. **[Tipo de problema]**: [Descripción breve]
-  - 🔍 Explicación: [Explicación clara del problema]
-  - ✅ Sugerencia: [Mejora o pregunta que permitiría clarificar o resolver el problema]
+   - 🔍 Explicación: [Explicación clara del problema]
+   - ✅ Sugerencia: [Mejora o pregunta que permitiría clarificar o resolver el problema]
 
 Ejemplo:
 
 ## 🧱 Problemas Detectados
 
 1. **Ambigüedad**: “Iniciar sesión fácilmente”
-  - 🔍 Explicación: No se define qué significa “fácilmente”. Puede referirse al tiempo, pasos necesarios, o usabilidad.
-  - ✅ Sugerencia: Reemplazar por un criterio medible, como “con un solo campo de entrada” o “en menos de 3 segundos”.
+   - 🔍 Explicación: No se define qué significa “fácilmente”. Puede referirse al tiempo, pasos necesarios, o usabilidad.
+   - ✅ Sugerencia: Reemplazar por un criterio medible, como “con un solo campo de entrada” o “en menos de 3 segundos”.
 \`\`\`
 `;

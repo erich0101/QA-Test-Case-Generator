@@ -149,6 +149,7 @@ function App() {
                 title: scenario.title,
                 gherkin: scenario.gherkin,
                 criteria: scenario.acceptanceCriteria,
+                assumptions: scenario.assumptions,
             }));
             setScenarios(prevScenarios => [...prevScenarios, ...newScenarios]);
             if (isHistoryEnabled) {

@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { ScenarioResult } from '../types';
 import ScenarioCard from './ScenarioCard';
@@ -31,7 +32,10 @@ const ResultsDisplay: React.FC<ResultsDisplayProps> = ({
 
   const formatScenarioToText = (scenario: ScenarioResult): string => {
     const criteriaText = scenario.criteria.map(c => `• ${c}`).join('\n');
-    return `Título: ${scenario.title}\n\n${scenario.gherkin}\n\nCriterios de Aceptación:\n${criteriaText}`;
+    const assumptionsText = (scenario.assumptions && scenario.assumptions.length > 0)
+      ? `\n\n⚠️ Suposiciones Realizadas:\n${scenario.assumptions.map(a => `• ${a}`).join('\n')}`
+      : '';
+    return `Título: ${scenario.title}\n\n${scenario.gherkin}\n\nCriterios de Aceptación:\n${criteriaText}${assumptionsText}`;
   };
 
   const handleCopyAll = () => {
@@ -67,11 +71,13 @@ const ResultsDisplay: React.FC<ResultsDisplayProps> = ({
           .replace(/Escenario: .*\n\n/i, '')
           .trim();
         const formattedCriteria = scenario.criteria.map(c => `• ${c}`).join('\n');
+        const formattedAssumptions = (scenario.assumptions || []).map(a => `• ${a}`).join('\n');
 
         return {
           'Escenario': scenario.title,
           'Pasos': formattedGherkin,
           'Criterios de aceptacion': formattedCriteria,
+          'Suposiciones': formattedAssumptions,
           'Resultados': '',
           'Observaciones': ''
         };
@@ -83,6 +89,7 @@ const ResultsDisplay: React.FC<ResultsDisplayProps> = ({
         { wch: 40 }, // Escenario
         { wch: 60 }, // Pasos
         { wch: 60 }, // Criterios de aceptacion
+        { wch: 50 }, // Suposiciones
         { wch: 30 }, // Resultados
         { wch: 40 }  // Observaciones
       ];
@@ -121,14 +128,14 @@ const ResultsDisplay: React.FC<ResultsDisplayProps> = ({
             aria-label="Copiar todos los escenarios"
           >
             <ClipboardIcon className="w-4 h-4" />
-            <span>{isCopied ? 'All Copied!' : 'Copiar todos'}</span>
+            <span>{isCopied ? 'All Copied!' : 'Copiar todo'}</span>
           </button>
           <button
             onClick={onClear}
             className="px-4 py-2 text-sm font-semibold text-rose-300 bg-rose-900/50 border border-brand-danger rounded-lg hover:bg-rose-800/70 transition-colors duration-200"
             aria-label="Borra todos los escenarios"
           >
-            Borrar todos
+            Borrar todo
           </button>
         </div>
       </div>

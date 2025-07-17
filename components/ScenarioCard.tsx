@@ -24,7 +24,10 @@ const ScenarioCard: React.FC<ScenarioCardProps> = ({
   const handleCopy = () => {
     const copyLogic = () => {
       const criteriaText = scenario.criteria.map(c => `• ${c}`).join('\n');
-      const fullText = `Título: ${scenario.title}\n\n${scenario.gherkin}\n\nCriterios de Aceptación:\n${criteriaText}`;
+      const assumptionsText = (scenario.assumptions && scenario.assumptions.length > 0)
+        ? `\n\n⚠️ Suposiciones Realizadas:\n${scenario.assumptions.map(a => `• ${a}`).join('\n')}`
+        : '';
+      const fullText = `Título: ${scenario.title}\n\n${scenario.gherkin}\n\nCriterios de Aceptación:\n${criteriaText}${assumptionsText}`;
       
       navigator.clipboard.writeText(fullText).then(() => {
         setIsCopied(true);
@@ -78,6 +81,20 @@ const ScenarioCard: React.FC<ScenarioCardProps> = ({
             </div>
           </div>
         </div>
+        
+        {scenario.assumptions && scenario.assumptions.length > 0 && (
+          <div>
+            <h4 className="text-sm font-bold uppercase tracking-wider text-yellow-400 mb-2">⚠️ Suposiciones Realizadas</h4>
+            <div className="bg-yellow-900/30 p-3 rounded-lg text-sm text-yellow-300">
+              <ul className="list-disc list-inside space-y-1">
+                {scenario.assumptions.map((assumption, index) => (
+                  <li key={index}>{assumption}</li>
+                ))}
+              </ul>
+            </div>
+          </div>
+        )}
+
       </div>
     </article>
   );

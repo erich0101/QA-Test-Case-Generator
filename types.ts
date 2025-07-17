@@ -3,6 +3,7 @@ export interface RawScenario {
   title: string;
   gherkin: string;
   acceptanceCriteria: string[];
+  assumptions?: string[];
 }
 
 export interface ScenarioResult {
@@ -10,6 +11,7 @@ export interface ScenarioResult {
   title:string;
   gherkin: string;
   criteria: string[];
+  assumptions?: string[];
 }
 
 export interface ImageAttachment {

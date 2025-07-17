@@ -32,7 +32,7 @@ const ApiInstructionsModal: React.FC<ApiInstructionsModalProps> = ({ isOpen, onC
           <section>
                 <h3 className="font-semibold text-lg text-cyan-400 mb-2">Opción 1: Desde las Herramientas del Desarrollador del Navegador (Recomendado)</h3>
                 <ol className="list-decimal list-inside space-y-2 text-slate-400">
-                    <li>Abre las <strong className="text-slate-200">Herramientas de Desarrollador</strong> en tu navegador (usualmente con F12 o clic derecho > Inspeccionar).</li>
+                    <li>Abre las <strong className="text-slate-200">Herramientas de Desarrollador</strong> en tu navegador (usualmente con F12 o clic derecho {'>'} Inspeccionar).</li>
                     <li>Ve a la pestaña <strong className="text-slate-200">"Network"</strong> o <strong className="text-slate-200">"Red"</strong>.</li>
                     <li>Realiza la acción en la página web que ejecuta la petición de API que quieres probar.</li>
                     <li>Busca la petición en la lista, haz clic derecho sobre ella.</li>

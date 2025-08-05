@@ -159,7 +159,7 @@ A partir del \`curl\` proporcionado, generá:
 
 ## 🧪 Buenas prácticas esperadas
 
-- Usar **variables del entorno** siempre (\`{{token}}\`, \`{{usuario_valido}}\`, etc.)
+- Usar **variables del entorno, excepto si el usuario en el promp o cURL solicita lo contrario** siempre (\`{{token}}\`, \`{{usuario_valido}}\`, etc.)
 - Validar códigos de estado (\`pm.response.to.have.status(...)\`)
 - Validar contenido del response (\`exception_message\`, \`token\`, etc.)
 - Guardar valores importantes en variables de entorno si serán reutilizados (ej. \`token\`)

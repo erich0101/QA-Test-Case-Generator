@@ -1,6 +1,6 @@
 
 import { GoogleGenAI } from "@google/genai";
-import { SYSTEM_PROMPT, API_CURL_TEST_PROMPT, USER_STORY_ANALYSIS_PROMPT } from '../constants';
+import { SYSTEM_PROMPT, API_CURL_TEST_PROMPT, USER_STORY_ANALYSIS_PROMPT, USER_STORY_OPTIMIZATION_PROMPT } from '../constants';
 import { RawScenario, ImageAttachment, ApiScenario } from '../types';
 
 type Mode = 'e2e' | 'api';
@@ -146,5 +146,53 @@ export async function analyzeUserStory(
             throw new Error(`Fallo al analizar la historia de usuario: ${error.message}`);
         }
         throw new Error("Ocurrió un error desconocido al comunicarse con la API para análisis.");
+    }
+}
+
+export async function optimizeUserStory(
+  promptText: string,
+  apiKey: string,
+  images: ImageAttachment[] = []
+): Promise<string> {
+  if (!apiKey) {
+    throw new Error("API Key is required.");
+  }
+  const ai = new GoogleGenAI({ apiKey });
+  
+  const contents: any[] = [];
+  const taskPrompt = `
+      ${promptText || '(No hay texto, basarse principalmente en la(s) imagen(es) adjunta(s) si existe(n))'}
+    `;
+    contents.push({ text: taskPrompt });
+
+    if (images.length > 0) {
+      images.forEach(image => {
+          contents.push({
+          inlineData: {
+              mimeType: image.mimeType,
+              data: image.data,
+          },
+          });
+      });
+    }
+
+    try {
+        const response = await ai.models.generateContent({
+            model: 'gemini-2.5-flash',
+            contents: { parts: contents },
+            config: {
+                systemInstruction: USER_STORY_OPTIMIZATION_PROMPT,
+                temperature: 0.4,
+            },
+        });
+
+        return response.text;
+
+    } catch (error) {
+        console.error("Error llamando a la API de Gemini para optimización de HU:", error);
+        if (error instanceof Error) {
+            throw new Error(`Fallo al optimizar la historia de usuario: ${error.message}`);
+        }
+        throw new Error("Ocurrió un error desconocido al comunicarse con la API para optimización.");
     }
 }

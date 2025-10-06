@@ -1,7 +1,6 @@
-
 import React, { useState, useCallback, useEffect, useRef } from 'react';
 import { RawScenario, ScenarioResult, ImageAttachment, ApiScenario, ApiScenarioResult, E2EHistoryItem, ApiHistoryItem } from './types';
-import { generateScenarios, analyzeUserStory } from './services/geminiService';
+import { generateScenarios, analyzeUserStory, optimizeUserStory } from './services/geminiService';
 import InputCard from './components/InputCard';
 import ResultsDisplay from './components/ResultsDisplay';
 import ApiResultsDisplay from './components/ApiResultsDisplay';
@@ -21,6 +20,7 @@ import HistoryManager from './components/HistoryManager';
 import HistoryPanel from './components/HistoryPanel';
 import AnalysisDisplay from './components/AnalysisDisplay';
 import ApiInstructionsModal from './components/ApiInstructionsModal';
+import OptimizedStoryDisplay from './components/OptimizedStoryDisplay';
 
 
 type AppMode = 'e2e' | 'api';
@@ -48,6 +48,8 @@ function App() {
   const [images, setImages] = useState<ImageAttachment[]>([]);
   const [scenarios, setScenarios] = useState<ScenarioResult[]>([]);
   const [analysisResult, setAnalysisResult] = useState<string | null>(null);
+  const [optimizedStory, setOptimizedStory] = useState<string | null>(null);
+
 
   // API state
   const [curlInput, setCurlInput] = useState<string>('');
@@ -120,28 +122,32 @@ function App() {
     }
   };
 
-  const handleGenerate = useCallback(async () => {
-    const isE2EMode = mode === 'e2e';
-    const isApiMode = mode === 'api';
-
+  const handleE2EGeneration = useCallback(async (options: { optimize: boolean }) => {
     if (isLoading || !apiKey) return;
-    if (isE2EMode && !userInput.trim() && images.length === 0) return;
-    if (isApiMode && !curlInput.trim()) return;
+    if (!userInput.trim() && images.length === 0) return;
 
     setIsLoading(true);
     setError(null);
-    if (isE2EMode) {
-        setAnalysisResult(null); // Clear previous analysis
-    }
+    setAnalysisResult(null);
+    setOptimizedStory(null);
 
     try {
-      if (isE2EMode) {
-        const [analysis, scenariosData] = await Promise.all([
-          analyzeUserStory(userInput, apiKey, images),
-          generateScenarios('e2e', userInput, apiKey, images)
-        ]);
+        const promises = [
+            analyzeUserStory(userInput, apiKey, images),
+            generateScenarios('e2e', userInput, apiKey, images)
+        ];
 
-        setAnalysisResult(analysis);
+        if (options.optimize) {
+            promises.push(optimizeUserStory(userInput, apiKey, images));
+        }
+
+        const [analysis, scenariosData, optimizedStoryData] = await Promise.all(promises);
+
+        // FIX: Cast `analysis` to string, as its type is inferred as a union type from Promise.all.
+        setAnalysisResult(analysis as string);
+        if (options.optimize) {
+            setOptimizedStory(optimizedStoryData as string);
+        }
         
         if (isRawScenarioArray(scenariosData)) {
             const newScenarios: ScenarioResult[] = scenariosData.map((scenario, index) => ({
@@ -149,7 +155,6 @@ function App() {
                 title: scenario.title,
                 gherkin: scenario.gherkin,
                 criteria: scenario.acceptanceCriteria,
-                assumptions: scenario.assumptions,
             }));
             setScenarios(prevScenarios => [...prevScenarios, ...newScenarios]);
             if (isHistoryEnabled) {
@@ -159,15 +164,33 @@ function App() {
                     userInput: userInput,
                     images: images,
                     scenarios: newScenarios,
-                    analysisResult: analysis
+                    // FIX: Cast `analysis` to string, as its type is inferred as a union type from Promise.all.
+                    analysisResult: analysis as string,
+                    optimizedStory: options.optimize ? (optimizedStoryData as string) : undefined
                 };
                 setE2eHistory(prev => [historyItem, ...prev]);
             }
         } else {
-            throw new Error('La API devolvió un tipo de datos inesperado para el modo E2E.');
+            throw new Error('La API devolvió un tipo de datos inesperado para la generación de escenarios E2E.');
         }
 
-      } else { // API Mode
+    } catch (e) {
+      console.error(e);
+      setError(e instanceof Error ? e.message : 'An unknown error occurred. Please check the console.');
+    } finally {
+      setIsLoading(false);
+    }
+  }, [userInput, isLoading, apiKey, images, isHistoryEnabled]);
+
+
+  const handleApiGeneration = useCallback(async () => {
+    if (isLoading || !apiKey) return;
+    if (!curlInput.trim()) return;
+
+    setIsLoading(true);
+    setError(null);
+    
+    try {
         const result = await generateScenarios('api', curlInput, apiKey);
         if (isApiScenarioArray(result)) {
             const newApiScenarios: ApiScenarioResult[] = result.map((scenario, index) => ({
@@ -187,14 +210,28 @@ function App() {
         } else {
             throw new Error('La API devolvió un tipo de datos inesperado para el modo API.');
         }
-      }
     } catch (e) {
       console.error(e);
       setError(e instanceof Error ? e.message : 'An unknown error occurred. Please check the console.');
     } finally {
       setIsLoading(false);
     }
-  }, [mode, userInput, curlInput, isLoading, apiKey, images, isHistoryEnabled]);
+  }, [curlInput, isLoading, apiKey, isHistoryEnabled]);
+
+
+  const handleGenerate = () => {
+    if (mode === 'e2e') {
+        handleE2EGeneration({ optimize: false });
+    } else {
+        handleApiGeneration();
+    }
+  };
+
+  const handleGenerateAndOptimize = () => {
+    if (mode === 'e2e') {
+        handleE2EGeneration({ optimize: true });
+    }
+  };
 
   const handleClear = useCallback(() => {
     // E2E
@@ -203,6 +240,7 @@ function App() {
     setImages([]);
     setUserInput('');
     setAnalysisResult(null);
+    setOptimizedStory(null);
     // API
     setApiScenarios([]);
     setCurlInput('');
@@ -229,6 +267,7 @@ function App() {
         setImages(item.images);
         setScenarios(item.scenarios);
         setAnalysisResult(item.analysisResult || null);
+        setOptimizedStory(item.optimizedStory || null);
     } else if (mode === 'api' && 'curlInput' in item) {
         setCurlInput(item.curlInput);
         setApiScenarios(item.scenarios);
@@ -294,6 +333,7 @@ function App() {
               userInput={userInput}
               setUserInput={setUserInput}
               onGenerate={handleGenerate}
+              onGenerateAndOptimize={handleGenerateAndOptimize}
               isLoading={isLoading}
               apiKey={apiKey}
               images={images}
@@ -333,6 +373,10 @@ function App() {
         
         {mode === 'e2e' && analysisResult && (
           <AnalysisDisplay markdownContent={analysisResult} />
+        )}
+        
+        {mode === 'e2e' && optimizedStory && (
+          <OptimizedStoryDisplay markdownContent={optimizedStory} />
         )}
 
         {mode === 'e2e' && scenarios.length > 0 && (

@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { ScenarioResult } from '../types';
 import ScenarioCard from './ScenarioCard';
@@ -13,6 +12,7 @@ interface ResultsDisplayProps {
   setCopiedScenarioIds: (ids: string[] | ((prevIds: string[]) => string[])) => void;
   setShowCopyWarningModal: (show: boolean) => void;
   setCopyAction: (action: (() => void) | null) => void;
+  onDeleteScenario: (id: string) => void;
 }
 
 const ResultsDisplay: React.FC<ResultsDisplayProps> = ({ 
@@ -21,7 +21,8 @@ const ResultsDisplay: React.FC<ResultsDisplayProps> = ({
   copiedScenarioIds,
   setCopiedScenarioIds,
   setShowCopyWarningModal,
-  setCopyAction
+  setCopyAction,
+  onDeleteScenario
  }) => {
   const [isCopied, setIsCopied] = useState(false);
   const [isExporting, setIsExporting] = useState(false);
@@ -32,10 +33,7 @@ const ResultsDisplay: React.FC<ResultsDisplayProps> = ({
 
   const formatScenarioToText = (scenario: ScenarioResult): string => {
     const criteriaText = scenario.criteria.map(c => `• ${c}`).join('\n');
-    const assumptionsText = (scenario.assumptions && scenario.assumptions.length > 0)
-      ? `\n\n⚠️ Suposiciones Realizadas:\n${scenario.assumptions.map(a => `• ${a}`).join('\n')}`
-      : '';
-    return `Título: ${scenario.title}\n\n${scenario.gherkin}\n\nCriterios de Aceptación:\n${criteriaText}${assumptionsText}`;
+    return `Título: ${scenario.title}\n\n${scenario.gherkin}\n\nCriterios de Aceptación:\n${criteriaText}`;
   };
 
   const handleCopyAll = () => {
@@ -71,13 +69,11 @@ const ResultsDisplay: React.FC<ResultsDisplayProps> = ({
           .replace(/Escenario: .*\n\n/i, '')
           .trim();
         const formattedCriteria = scenario.criteria.map(c => `• ${c}`).join('\n');
-        const formattedAssumptions = (scenario.assumptions || []).map(a => `• ${a}`).join('\n');
 
         return {
           'Escenario': scenario.title,
           'Pasos': formattedGherkin,
           'Criterios de aceptacion': formattedCriteria,
-          'Suposiciones': formattedAssumptions,
           'Resultados': '',
           'Observaciones': ''
         };
@@ -89,7 +85,6 @@ const ResultsDisplay: React.FC<ResultsDisplayProps> = ({
         { wch: 40 }, // Escenario
         { wch: 60 }, // Pasos
         { wch: 60 }, // Criterios de aceptacion
-        { wch: 50 }, // Suposiciones
         { wch: 30 }, // Resultados
         { wch: 40 }  // Observaciones
       ];
@@ -148,6 +143,7 @@ const ResultsDisplay: React.FC<ResultsDisplayProps> = ({
           setCopiedScenarioIds={setCopiedScenarioIds}
           setShowCopyWarningModal={setShowCopyWarningModal}
           setCopyAction={setCopyAction}
+          onDelete={onDeleteScenario}
         />
       ))}
     </div>

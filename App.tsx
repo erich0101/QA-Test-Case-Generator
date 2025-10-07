@@ -299,6 +299,10 @@ function App() {
     setCopyAction(null);
   };
 
+  const handleDeleteScenario = (idToDelete: string) => {
+    setScenarios(prevScenarios => prevScenarios.filter(scenario => scenario.id !== idToDelete));
+  };
+
   const currentHistory = mode === 'e2e' ? e2eHistory : apiHistory;
 
   return (
@@ -387,6 +391,7 @@ function App() {
             setCopiedScenarioIds={setCopiedScenarioIds}
             setShowCopyWarningModal={setShowCopyWarningModal}
             setCopyAction={setCopyAction}
+            onDeleteScenario={handleDeleteScenario}
           />
         )}
         

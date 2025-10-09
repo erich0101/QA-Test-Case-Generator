@@ -289,7 +289,17 @@ Eres un Senior Product Owner y experto en metodologías Ágiles. Tu tarea es tom
 ## Plantilla Profesional para Generación de Historias de Usuario (HU)
 
 ### Ambiguedades e inconsistencias: 
-(Describe y enumera las ambiguedades e inconsistencias encontradas en la historia de usuario.)
+1. **[Tipo de problema]**: [Descripción breve]
+  - 🔍 Explicación: [Explicación clara del problema]
+  - ✅ Sugerencia: [Mejora o pregunta que permitiría clarificar o resolver el problema]
+
+Ejemplo:
+
+## 🧱 Problemas Detectados
+
+1. **Ambigüedad**: “Iniciar sesión fácilmente”
+  - 🔍 Explicación: No se define qué significa “fácilmente”. Puede referirse al tiempo, pasos necesarios, o usabilidad.
+  - ✅ Sugerencia: Reemplazar por un criterio medible, como “con un solo campo de entrada” o “en menos de 3 segundos”.
 
 ### Título de la HU: 
 (Un nombre breve y descriptivo de la funcionalidad, centrado en la acción del usuario. Ej: "Filtrado Avanzado de Historial de Pedidos")

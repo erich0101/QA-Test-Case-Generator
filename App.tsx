@@ -122,65 +122,80 @@ function App() {
     }
   };
 
-  const handleE2EGeneration = useCallback(async (options: { optimize: boolean }) => {
+  const handleE2EGeneration = useCallback(async () => {
     if (isLoading || !apiKey) return;
     if (!userInput.trim() && images.length === 0) return;
 
     setIsLoading(true);
     setError(null);
     setAnalysisResult(null);
-    setOptimizedStory(null);
 
     try {
-        const promises = [
-            analyzeUserStory(userInput, apiKey, images),
-            generateScenarios('e2e', userInput, apiKey, images)
-        ];
+      const [analysis, scenariosData] = await Promise.all([
+        analyzeUserStory(userInput, apiKey, images),
+        generateScenarios('e2e', userInput, apiKey, images),
+      ]);
 
-        if (options.optimize) {
-            promises.push(optimizeUserStory(userInput, apiKey, images));
+      setAnalysisResult(analysis);
+
+      if (isRawScenarioArray(scenariosData)) {
+        const newScenarios: ScenarioResult[] = scenariosData.map(
+          (scenario, index) => ({
+            id: `${Date.now()}-${index}`,
+            title: scenario.title,
+            gherkin: scenario.gherkin,
+            criteria: scenario.acceptanceCriteria,
+          })
+        );
+        setScenarios((prevScenarios) => [...prevScenarios, ...newScenarios]);
+
+        if (isHistoryEnabled) {
+          const historyItem: E2EHistoryItem = {
+            id: `hist-e2e-${Date.now()}`,
+            timestamp: Date.now(),
+            userInput: userInput,
+            images: images,
+            scenarios: newScenarios,
+            analysisResult: analysis,
+            optimizedStory: optimizedStory || undefined, // Include existing optimized story
+          };
+          setE2eHistory((prev) => [historyItem, ...prev]);
         }
-
-        const [analysis, scenariosData, optimizedStoryData] = await Promise.all(promises);
-
-        // FIX: Cast `analysis` to string, as its type is inferred as a union type from Promise.all.
-        setAnalysisResult(analysis as string);
-        if (options.optimize) {
-            setOptimizedStory(optimizedStoryData as string);
-        }
-        
-        if (isRawScenarioArray(scenariosData)) {
-            const newScenarios: ScenarioResult[] = scenariosData.map((scenario, index) => ({
-                id: `${Date.now()}-${index}`,
-                title: scenario.title,
-                gherkin: scenario.gherkin,
-                criteria: scenario.acceptanceCriteria,
-            }));
-            setScenarios(prevScenarios => [...prevScenarios, ...newScenarios]);
-            if (isHistoryEnabled) {
-                const historyItem: E2EHistoryItem = {
-                    id: `hist-e2e-${Date.now()}`,
-                    timestamp: Date.now(),
-                    userInput: userInput,
-                    images: images,
-                    scenarios: newScenarios,
-                    // FIX: Cast `analysis` to string, as its type is inferred as a union type from Promise.all.
-                    analysisResult: analysis as string,
-                    optimizedStory: options.optimize ? (optimizedStoryData as string) : undefined
-                };
-                setE2eHistory(prev => [historyItem, ...prev]);
-            }
-        } else {
-            throw new Error('La API devolvió un tipo de datos inesperado para la generación de escenarios E2E.');
-        }
-
+      } else {
+        throw new Error(
+          'La API devolvió un tipo de datos inesperado para la generación de escenarios E2E.'
+        );
+      }
     } catch (e) {
       console.error(e);
-      setError(e instanceof Error ? e.message : 'An unknown error occurred. Please check the console.');
+      setError(
+        e instanceof Error
+          ? e.message
+          : 'An unknown error occurred. Please check the console.'
+      );
     } finally {
       setIsLoading(false);
     }
-  }, [userInput, isLoading, apiKey, images, isHistoryEnabled]);
+  }, [userInput, images, isLoading, apiKey, isHistoryEnabled, optimizedStory]);
+
+  const handleOptimize = useCallback(async () => {
+    if (isLoading || !apiKey) return;
+    if (!userInput.trim() && images.length === 0) return;
+
+    setIsLoading(true);
+    setError(null);
+    setOptimizedStory(null);
+
+    try {
+        const optimizedStoryData = await optimizeUserStory(userInput, apiKey, images);
+        setOptimizedStory(optimizedStoryData);
+    } catch (e) {
+        console.error(e);
+        setError(e instanceof Error ? e.message : 'An unknown error occurred while optimizing. Please check the console.');
+    } finally {
+        setIsLoading(false);
+    }
+  }, [userInput, images, isLoading, apiKey]);
 
 
   const handleApiGeneration = useCallback(async () => {
@@ -221,7 +236,7 @@ function App() {
 
   const handleGenerate = () => {
     if (mode === 'e2e') {
-        handleE2EGeneration({ optimize: false });
+        handleE2EGeneration();
     } else {
         handleApiGeneration();
     }
@@ -229,7 +244,7 @@ function App() {
 
   const handleGenerateAndOptimize = () => {
     if (mode === 'e2e') {
-        handleE2EGeneration({ optimize: true });
+        handleOptimize();
     }
   };
 

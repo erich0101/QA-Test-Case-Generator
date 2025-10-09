@@ -1,4 +1,3 @@
-
 import React, { useRef, useCallback } from 'react';
 import { SparklesIcon } from './icons/SparklesIcon';
 import { PaperclipIcon } from './icons/PaperclipIcon';
@@ -165,7 +164,7 @@ const InputCard: React.FC<InputCardProps> = ({ userInput, setUserInput, onGenera
               onClick={onGenerateAndOptimize}
               disabled={isButtonDisabled}
               className="flex items-center justify-center gap-2 px-4 py-3 bg-brand-secondary text-white font-semibold rounded-lg shadow-md hover:bg-emerald-600 disabled:bg-slate-600 disabled:cursor-not-allowed transition-all duration-300 transform hover:scale-105 disabled:scale-100"
-              aria-label="Generar Escenarios y Optimizar HU"
+              aria-label="Optimizar Historia de Usuario"
             >
               {isLoading ? (
                 <>

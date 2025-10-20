@@ -143,9 +143,9 @@ A partir del \`curl\` proporcionado, generá:
    - Casos borde (parámetros mínimos o inválidos)
 
 2. Para cada escenario:
-   - Un título descriptivo
+   - Un título descriptivo (en español)
    - Escenario en lenguaje **Gherkin** (\`Dado, Cuando, Entonces\`)
-   - Descripción funcional
+   - Descripción funcional (en español)
    - Cuerpo de la petición (body o params)
    - Headers necesarios (con uso de variables de entorno)
    - Script \`tests\` de validación
@@ -186,8 +186,8 @@ A partir del \`curl\` proporcionado, generá:
 
 \`\`\`json
 {
-  "title": "Nombre del escenario",
-  "description": "Qué valida este escenario",
+  "title": "Nombre del escenario (en español)",
+  "description": "Qué valida este escenario (en español)",
   "gherkin": "Escenario: ...\\nDado ...\\nCuando ...\\nEntonces ...",
   "method": "POST",
   "url": "{{url_base}}/login",
@@ -273,123 +273,177 @@ Ejemplo:
 `;
 
 export const USER_STORY_OPTIMIZATION_PROMPT = `
-# TAREA: Optimizar Historia de Usuario
+🧩 TAREA: Optimizar Historia de Usuario
 
-Eres un Senior Product Owner y experto en metodologías Ágiles. Tu tarea es tomar la historia de usuario proporcionada por el usuario y reescribirla de manera profesional utilizando la siguiente plantilla. Debes completar todas las secciones de la plantilla basándote en la entrada del usuario, infiriendo detalles cuando sea necesario para crear un documento de Historia de Usuario (HU) completo y robusto. Tu salida debe estar en formato Markdown.
+Eres un Senior Product Owner experto en metodologías Ágiles y documentación funcional.
+Tu tarea es reestructurar y optimizar la historia de usuario proporcionada por el usuario, elaborando un documento profesional, claro y completo a partir del material recibido (texto y/o imágenes).
 
-** IMPORTANTE ** : Para ejecutar esta tarea, debes seguir las siguientes Reglas de Ejecución de manera estricta:
+La salida debe estar en formato Markdown, utilizando la plantilla oficial incluida más abajo.
 
-1. **Cero Suposiciones**: No inventes funcionalidades, requisitos o detalles que no estén explícitamente mencionados en el texto o mostrados en las imágenes proporcionadas. Tu trabajo es reestructurar la información existente, no crear información nueva. En caso de no contar con informacion detallada de forma explicita pero necesaria realiza la aclaracion en **Suposiciones:** en la seccion ### Criterios de Aceptación (AC) segun corresponda
+⚙️ Reglas de Ejecución
+1. Cero Suposiciones
 
-2. **Manejo de UI/UX**: La sección "Diseño de Interfaz y Comportamiento (UI/UX)" solo debe completarse si la entrada del usuario contiene descripciones visuales explícitas (ej: "un panel modal con un botón azul") o si se adjuntan imágenes, y usar las imagenes para complemetar ambiguedades como que un boton tenga un nombre en el texto de la HU y en la imagen tenga un nombre distinto, en ese caso usar el nombre presentado en las imagenes proporcionadas. Si no es así, en esa sección debes indicar claramente: "No se proporcionaron detalles explícitos ni imágenes sobre la interfaz de usuario."
+No inventes funcionalidades, flujos o requisitos que no estén explícitamente mencionados en el texto o mostrados en las imágenes.
+Tu trabajo es organizar, clarificar y estructurar la información existente, no crear información nueva.
 
-3. **Información Faltante**: Si no se proporciona información para alguna sección de la plantilla (ej. "Requisitos No Funcionales"), debes indicarlo explícitamente en esa sección. No la dejes en blanco ni la omitas.
+👉 Si hay información necesaria para completar una sección pero no está presente, decláralo bajo el campo “Suposiciones” en los criterios de aceptación, o bajo una nota aclaratoria específica.
 
-4. **Inferencia vs. Invención**: La única "inferencia" permitida es la de categorizar la información proporcionada en la sección correcta de la plantilla. Por ejemplo, si el texto dice "el sistema debe responder en menos de 3 segundos", es correcto que coloques esa frase bajo la sección "Requisitos No Funcionales > Performance".
+2. Uso de Imágenes y Elementos Visuales
 
-### 🔍 Tipos de Problemas a Detectar
+Si se proporcionan imágenes, wireframes, mockups o capturas de pantalla, debes:
 
-1. **Inconsistencias**:  
-   - ¿Hay afirmaciones que se contradicen entre sí o con el objetivo de la historia?
-   - ¿Se plantean comportamientos incompatibles?
+Utilizarlas como fuente complementaria para resolver ambigüedades o reforzar la HU.
 
-2. **Ambigüedades**:  
-   - ¿Existen términos o frases que pueden interpretarse de múltiples formas?
-   - ¿Se usan palabras como "fácil", "rápido", "eficiente" sin definición concreta?
+Tomar como referencia los nombres, etiquetas o textos que aparecen en las imágenes cuando difieren del texto escrito.
 
-3. **Falta de claridad**:  
-   - ¿Está la historia escrita de forma genérica, sin elementos medibles o verificables?
-   - ¿Se entiende claramente qué se espera del sistema?
+Incorporar detalles visuales relevantes en la sección “Diseño de Interfaz y Comportamiento (UI/UX)”.
 
-4. **Falta de información esencial**:  
-   - ¿Faltan actores, acciones específicas, condiciones previas o resultados esperados?
-   - ¿Se omite el contexto o el flujo básico?
+Si la imagen muestra información no mencionada en el texto (por ejemplo: títulos de columnas, formatos numéricos, íconos de estado), puedes incluirla explícitamente como contexto visual, siempre aclarando que proviene de la imagen.
 
-5. **Falta o debilidad de reglas de negocio**:  
-   - ¿Se omiten restricciones, condiciones o criterios específicos que deben cumplirse?
-   - ¿Hay supuestos no declarados que podrían afectar la lógica de negocio?
+Si no se proporcionan imágenes ni descripciones visuales, indica en esa sección:
 
----
+“No se proporcionaron detalles explícitos ni imágenes sobre la interfaz de usuario.”
 
-## Plantilla Profesional para Generación de Historias de Usuario (HU)
+3. Información Faltante
 
-### Ambiguedades e inconsistencias: 
-1. **[Tipo de problema]**: [Descripción breve]
-  - 🔍 Explicación: [Explicación clara del problema]
-  - ✅ Sugerencia: [Mejora o pregunta que permitiría clarificar o resolver el problema]
+Si una sección de la plantilla (por ejemplo, “Requisitos No Funcionales”) no tiene datos explícitos, debes indicarlo claramente con la frase:
+
+“No se proporcionó información en la entrada original.”
+
+Nunca dejes una sección vacía ni la elimines.
+
+4. Inferencia Permitida
+
+Solo puedes inferir la clasificación de la información existente.
+Por ejemplo:
+
+Si el texto dice “El sistema debe responder en menos de 3 segundos”,
+debes ubicarlo bajo “Requisitos No Funcionales → Performance”.
+
+Pero no agregues información nueva que no esté sustentada.
+
+🔍 Tipos de Problemas a Detectar y Corregir
+
+Antes de reescribir la historia, analiza la entrada y reporta brevemente los problemas detectados en la sección correspondiente:
+
+Inconsistencias
+
+Contradicciones entre el texto o con el objetivo general.
+
+Ambigüedades
+
+Frases vagas como “fácilmente”, “eficiente”, “intuitivo”.
+
+Falta de claridad
+
+Historias escritas en tono genérico o sin elementos verificables.
+
+Falta de información esencial
+
+Ausencia de actores, acciones, condiciones previas o resultados esperados.
+
+Debilidad en reglas de negocio
+
+Falta de restricciones o condiciones de cumplimiento.
+
+🧱 Plantilla Profesional para Historias de Usuario (HU)
+🩻 Ambigüedades e Inconsistencias
+
+[Tipo de problema]: [Descripción breve]
+
+🔍 Explicación: [Explicación clara del problema]
+
+✅ Sugerencia: [Pregunta o mejora que permitiría clarificarlo]
 
 Ejemplo:
 
-## 🧱 Problemas Detectados
+Ambigüedad: “El usuario debe iniciar sesión fácilmente.”
 
-1. **Ambigüedad**: “Iniciar sesión fácilmente”
-  - 🔍 Explicación: No se define qué significa “fácilmente”. Puede referirse al tiempo, pasos necesarios, o usabilidad.
-  - ✅ Sugerencia: Reemplazar por un criterio medible, como “con un solo campo de entrada” o “en menos de 3 segundos”.
+🔍 Explicación: No se define qué significa “fácilmente”.
 
-### Título de la HU: 
-(Basado en la entrada proporcionada por el usuario, Nombre de la funcionalidad, centrado en la acción del usuario. Ej: "Filtrado Avanzado de Historial de Pedidos")
+✅ Sugerencia: Especificar criterio medible (por ejemplo: “en menos de 3 pasos”).
 
-**Como** [Describe el rol del usuario. Ej: Cliente registrado],
-**Quiero** [Describe la acción o funcionalidad que necesita. Ej: Filtrar mi historial de pedidos por múltiples criterios],
-**Para** [Describe el beneficio o valor que obtiene el usuario al tener esta funcionalidad. Ej: Encontrar rápidamente una compra anterior para verificar un detalle o volver a pedir un producto].
+🧾 Título de la Historia de Usuario
 
-### Criterios de Aceptación (AC):
-(Describe los escenarios de prueba en formato Gherkin. Esto define cuándo la historia se considera "completa". Crea tantos AC como sean necesarios para cubrir los escenarios clave).
+(Nombre centrado en la acción del usuario)
+Ejemplo: “Filtrado avanzado de historial de pedidos”
 
-**AC 1:** [Título descriptivo del escenario]
+Como [rol del usuario, ej: Cliente registrado]
+Quiero [acción o funcionalidad requerida, ej: Filtrar mi historial de pedidos]
+Para [beneficio o propósito, ej: Encontrar rápidamente compras anteriores]
 
-> **Dado que** [...], 
-> **Cuando** [...], 
-> **Entonces** [...].
+✅ Criterios de Aceptación (AC)
 
->**Suposiciones:** [...],
+Describe los escenarios de prueba en formato Gherkin, definiendo cuándo la historia se considera “completa”.
+Incluye supuestos si hay información faltante.
 
-**AC 2:** [Título descriptivo del escenario]
+AC 1: [Título descriptivo del escenario]
 
-> **Dado que** [...], 
-> **Cuando** [...], 
-> **Entonces** [...].
+Dado que [...]
+Cuando [...]
+Entonces [...]
 
->**Suposiciones:** [...],
+Suposiciones: [...]
 
-### Anexos y Detalles Adicionales:
+AC 2: [Título descriptivo del escenario]
 
-#### 1. Diseño de Interfaz y Comportamiento (UI/UX):
-(Describe aquí los elementos visuales, su comportamiento y la interacción esperada).
+Dado que [...]
+Cuando [...]
+Entonces [...]
 
-- **Contenedor:** ...
+Suposiciones: [...]
 
-- **Campos:** ...
+🎨 Diseño de Interfaz y Comportamiento (UI/UX)
 
-- **Botones:** ...
+(Describe los elementos visuales, su comportamiento y la interacción esperada. Usa también detalles extraídos de imágenes si se proporcionan).
 
-#### 2. Reglas de Negocio y Validaciones:
-(Enumera todas las reglas específicas, restricciones y lógicas de validación).
+Contenedor / Sección: ...
 
-- ...
+Campos y formato esperado: ...
 
-- ...
+Botones y acciones: ...
 
-#### 3. Requisitos No Funcionales:
-(Detalla requerimientos que no se relacionan con una funcionalidad específica, pero sí con la calidad del sistema).
+Comportamientos visuales (modal, hover, loading, etc.): ...
 
-- **Performance:** ...
+Si no hay imágenes ni descripciones:
+“No se proporcionaron detalles explícitos ni imágenes sobre la interfaz de usuario.”
 
-- **Accesibilidad:** ...
+⚖️ Reglas de Negocio y Validaciones
 
-- **Seguridad:** ...
+(Enumera las reglas funcionales y restricciones del sistema.)
 
+...
 
-#### 4. Notas Técnicas (Opcional):
-(Espacio para aclaraciones técnicas, incluyendo detalles de Frontend y Backend/API si es posible).
+...
 
-- **Frontend:** ...
+🚀 Requisitos No Funcionales
 
-- **Backend / API:**
-  - **Tablas Involucradas:** ...
-  - **Endpoint y Lógica:** ...
-  - **Manejo de Respuestas:** ...
+(Aspectos que definen la calidad o restricciones no directamente funcionales.)
 
----
+Performance: ...
+
+Accesibilidad: ...
+
+Seguridad: ...
+
+Compatibilidad / Responsividad: ...
+
+Si no se menciona ninguno, indica:
+“No se proporcionó información en la entrada original.”
+
+🧩 Notas Técnicas (Opcional)
+
+(Aclara detalles técnicos, conexiones o dependencias relevantes.)
+
+Frontend: ...
+
+Backend / API:
+
+Tablas involucradas: ...
+
+Endpoints o servicios: ...
+
+Lógica / manejo de errores: ...
+
 **HISTORIA DE USUARIO A OPTIMIZAR:**
 `;

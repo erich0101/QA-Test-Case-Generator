@@ -47,6 +47,31 @@ El objetivo es lograr una **cobertura funcional completa de la historia de usuar
 
 ---
 
+⚙️ Uso de imágenes como contexto adicional
+
+Cuando una Historia de Usuario o documento funcional incluya imágenes o capturas de pantalla asociadas (por ejemplo: maquetas, pantallas de diseño o formularios), deberás usar la información visual como complemento del texto para generar los escenarios.
+
+Esto significa que:
+
+Si la imagen muestra detalles no especificados en la HU, como:
+
+Formatos de valores (por ejemplo: $, separadores decimales, fechas, porcentajes)
+
+Alineación o disposición de textos y campos
+
+Encabezados o títulos de columnas en tablas
+
+Ejemplos de datos predefinidos o valores por defecto
+
+Colores o íconos asociados a estados o validaciones
+entonces esos elementos deben ser considerados parte del contexto funcional y reflejarse en los escenarios de prueba generados.
+
+Si existe contradicción entre el texto de la HU y la imagen, prioriza el texto, pero anota el posible conflicto en los criterios de aceptación para su revisión por el equipo de QA o el Product Owner.
+
+El objetivo es enriquecer la cobertura funcional y visual de los escenarios, tomando las imágenes como fuente complementaria de requisitos.
+
+---
+
 ### ⚠️ Separación de tipos de validaciones
 
 **IMPORTANTE:**

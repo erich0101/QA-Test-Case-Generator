@@ -3,6 +3,7 @@ import { ScenarioResult } from '../types';
 import AcceptanceCriterion from './AcceptanceCriterion';
 import { ClipboardIcon } from './icons/ClipboardIcon';
 import { TrashIcon } from './icons/TrashIcon';
+import { InfoIcon } from './icons/InfoIcon';
 
 interface ScenarioCardProps {
   scenario: ScenarioResult;
@@ -26,7 +27,8 @@ const ScenarioCard: React.FC<ScenarioCardProps> = ({
   const handleCopy = () => {
     const copyLogic = () => {
       const criteriaText = scenario.criteria.map(c => `• ${c}`).join('\n');
-      const fullText = `Título: ${scenario.title}\n\n${scenario.gherkin}\n\nCriterios de Aceptación:\n${criteriaText}`;
+      const assumptionText = scenario.assumption ? `\nATENCIÓN - Suposición: ${scenario.assumption}\n` : '';
+      const fullText = `Título: ${scenario.title}${assumptionText}\n\n${scenario.gherkin}\n\nCriterios de Aceptación:\n${criteriaText}`;
       
       navigator.clipboard.writeText(fullText).then(() => {
         setIsCopied(true);
@@ -67,6 +69,16 @@ const ScenarioCard: React.FC<ScenarioCardProps> = ({
             </button>
         </div>
       </header>
+
+      {scenario.assumption && (
+        <div className="p-4 bg-yellow-900/30 border-b border-slate-700 flex items-start gap-3">
+          <InfoIcon className="w-5 h-5 text-yellow-400 flex-shrink-0 mt-0.5" />
+          <div>
+            <h4 className="font-semibold text-yellow-300">Suposición Realizada</h4>
+            <p className="text-sm text-yellow-300/90">{scenario.assumption}</p>
+          </div>
+        </div>
+      )}
       
       <div className="p-4 space-y-4">
         <div>

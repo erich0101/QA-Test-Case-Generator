@@ -33,7 +33,8 @@ const ResultsDisplay: React.FC<ResultsDisplayProps> = ({
 
   const formatScenarioToText = (scenario: ScenarioResult): string => {
     const criteriaText = scenario.criteria.map(c => `• ${c}`).join('\n');
-    return `Título: ${scenario.title}\n\n${scenario.gherkin}\n\nCriterios de Aceptación:\n${criteriaText}`;
+    const assumptionText = scenario.assumption ? `\nATENCIÓN - Suposición: ${scenario.assumption}\n` : '';
+    return `Título: ${scenario.title}${assumptionText}\n\n${scenario.gherkin}\n\nCriterios de Aceptación:\n${criteriaText}`;
   };
 
   const handleCopyAll = () => {
@@ -71,6 +72,7 @@ const ResultsDisplay: React.FC<ResultsDisplayProps> = ({
         const formattedCriteria = scenario.criteria.map(c => `• ${c}`).join('\n');
 
         return {
+          'Suposición': scenario.assumption || '',
           'Escenario': scenario.title,
           'Pasos': formattedGherkin,
           'Criterios de aceptacion': formattedCriteria,
@@ -82,6 +84,7 @@ const ResultsDisplay: React.FC<ResultsDisplayProps> = ({
       const worksheet = XLSX.utils.json_to_sheet(dataForSheet);
 
       worksheet['!cols'] = [
+        { wch: 50 }, // Suposición
         { wch: 40 }, // Escenario
         { wch: 60 }, // Pasos
         { wch: 60 }, // Criterios de aceptacion

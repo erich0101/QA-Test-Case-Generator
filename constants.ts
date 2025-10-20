@@ -104,7 +104,8 @@ La estructura de cada objeto en el array debe ser la siguiente:
   "acceptanceCriteria": [
     "Un criterio de aceptación claro y verificable.",
     "Otro criterio de aceptación."
-  ]
+  ],
+  "assumption": "Se asumió que el sistema debe mostrar un mensaje de error general, ya que no se especificó en la HU ni se encontro referencia visual en las imágenes proporcionadas."
 }
 \`\`\`
 

@@ -1,4 +1,3 @@
-
 export const SYSTEM_PROMPT = `
 # Prompt para Entrenamiento de GPT Especializado en QA y Testing
 

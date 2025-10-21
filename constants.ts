@@ -1,4 +1,3 @@
-
 export const SYSTEM_PROMPT = `
 # Prompt para Entrenamiento de GPT Especializado en QA y Testing
 
@@ -447,4 +446,5 @@ Endpoints o servicios: ...
 Lógica / manejo de errores: ...
 
 **HISTORIA DE USUARIO A OPTIMIZAR:**
+
 `;

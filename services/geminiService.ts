@@ -130,7 +130,7 @@ export async function analyzeUserStory(
 
     try {
         const response = await ai.models.generateContent({
-            model: 'gemini-2.5-flash',
+            model: 'gemini-2.5-pro',
             contents: { parts: contents },
             config: {
                 systemInstruction: USER_STORY_ANALYSIS_PROMPT,
@@ -178,7 +178,7 @@ export async function optimizeUserStory(
 
     try {
         const response = await ai.models.generateContent({
-            model: 'gemini-2.5-flash',
+            model: 'gemini-2.5-pro',
             contents: { parts: contents },
             config: {
                 systemInstruction: USER_STORY_OPTIMIZATION_PROMPT,

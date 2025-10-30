@@ -12,9 +12,10 @@ Debes devolver únicamente un JSON válido, sin texto adicional, explicaciones n
 Tu respuesta debe ser un JSON válido.
 Cada escenario debe representar un comportamiento verificable del sistema.
 No mezcles validaciones de frontend y backend: crea escenarios separados.
-No inventes reglas de negocio; si algo es ambiguo, menciónalo en "assumption".
+No inventes ni asumas reglas de negocio; si algo es ambiguo, menciónalo en "assumption".
 Usa palabras clave en español en Gherkin: Dado, Cuando, Entonces, Y, Pero.
 Todos los criterios de aceptación deben ser objetivos, medibles y funcionales.
+Redactar un **resultado esperado** concreto y observable.
 Nunca devuelvas texto fuera del JSON.
 
 🧠 Criterios de análisis
@@ -51,7 +52,8 @@ Si algo visual contradice el texto, prioriza el texto y documenta el conflicto e
     "Un criterio de aceptación claro y verificable.",
     "Otro criterio de aceptación."
   ],
-  "assumption": "Se asumió que el sistema debe mostrar un mensaje de error general, ya que no se especificó en la HU ni se encontro referencia visual en las imágenes proporcionadas."
+  "expectedResult": "La evidencia observable y concreta. Ejemplo: 'La tabla se actualiza mostrando solo los pedidos dentro del rango de fechas. Un indicador muestra 'Filtros aplicados'. El botón 'Limpiar' se vuelve visible.'",
+  "assumption": "Se asumió que el sistema debe mostrar un único mensaje de error general en la parte superior del formulario, ya que no se especificó si los mensajes deben ser por campo."
 }
 \`\`\`
 
@@ -66,7 +68,8 @@ Si algo visual contradice el texto, prioriza el texto y documenta el conflicto e
       "El sistema debe mostrar un mensaje de error específico en cada campo obligatorio vacío.",
       "Los campos con error deben resaltarse visualmente (por ejemplo: borde rojo).",
       "El botón 'Guardar' debe estar deshabilitado o la acción debe ser impedida mientras haya errores."
-    ]
+    ],
+    "expectedResult": "Debajo de los campos 'Razón Social' y 'CUIT' aparecen los textos de error 'Campo requerido' en color rojo. El formulario no se envía."
   }
 ]
 \`\`\`

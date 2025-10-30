@@ -2,6 +2,7 @@ export interface RawScenario {
   title: string;
   gherkin: string;
   acceptanceCriteria: string[];
+  expectedResult?: string;
   assumption?: string;
 }
 
@@ -10,6 +11,7 @@ export interface ScenarioResult {
   title:string;
   gherkin: string;
   criteria: string[];
+  expectedResult?: string;
   assumption?: string;
 }
 

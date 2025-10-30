@@ -145,6 +145,7 @@ function App() {
             title: scenario.title,
             gherkin: scenario.gherkin,
             criteria: scenario.acceptanceCriteria,
+            expectedResult: scenario.expectedResult,
             assumption: scenario.assumption,
           })
         );

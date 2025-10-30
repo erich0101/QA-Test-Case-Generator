@@ -4,6 +4,7 @@ import AcceptanceCriterion from './AcceptanceCriterion';
 import { ClipboardIcon } from './icons/ClipboardIcon';
 import { TrashIcon } from './icons/TrashIcon';
 import { InfoIcon } from './icons/InfoIcon';
+import { TargetIcon } from './icons/TargetIcon';
 
 interface ScenarioCardProps {
   scenario: ScenarioResult;
@@ -28,7 +29,8 @@ const ScenarioCard: React.FC<ScenarioCardProps> = ({
     const copyLogic = () => {
       const criteriaText = scenario.criteria.map(c => `• ${c}`).join('\n');
       const assumptionText = scenario.assumption ? `\nATENCIÓN - Suposición: ${scenario.assumption}\n` : '';
-      const fullText = `Título: ${scenario.title}${assumptionText}\n\n${scenario.gherkin}\n\nCriterios de Aceptación:\n${criteriaText}`;
+      const expectedResultText = scenario.expectedResult ? `\n\nResultado Esperado:\n${scenario.expectedResult}` : '';
+      const fullText = `Título: ${scenario.title}${assumptionText}\n\n${scenario.gherkin}\n\nCriterios de Aceptación:\n${criteriaText}${expectedResultText}`;
       
       navigator.clipboard.writeText(fullText).then(() => {
         setIsCopied(true);
@@ -101,6 +103,18 @@ const ScenarioCard: React.FC<ScenarioCardProps> = ({
             </div>
           </div>
         </div>
+
+        {scenario.expectedResult && (
+          <div>
+            <h4 className="flex items-center gap-2 text-sm font-bold uppercase tracking-wider text-slate-400 mb-3">
+              <TargetIcon className="w-4 h-4" />
+              Resultado Esperado
+            </h4>
+            <div className="bg-black/50 p-4 rounded-lg text-sm font-mono">
+              <p className="text-slate-300 whitespace-pre-wrap break-words">{scenario.expectedResult}</p>
+            </div>
+          </div>
+        )}
       </div>
     </article>
   );

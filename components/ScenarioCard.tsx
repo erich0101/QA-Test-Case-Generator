@@ -5,6 +5,8 @@ import { ClipboardIcon } from './icons/ClipboardIcon';
 import { TrashIcon } from './icons/TrashIcon';
 import { InfoIcon } from './icons/InfoIcon';
 import { TargetIcon } from './icons/TargetIcon';
+import { ChecklistIcon } from './icons/ChecklistIcon';
+import { DatabaseIcon } from './icons/DatabaseIcon';
 
 interface ScenarioCardProps {
   scenario: ScenarioResult;
@@ -29,8 +31,10 @@ const ScenarioCard: React.FC<ScenarioCardProps> = ({
     const copyLogic = () => {
       const criteriaText = scenario.criteria.map(c => `• ${c}`).join('\n');
       const assumptionText = scenario.assumption ? `\nATENCIÓN - Suposición: ${scenario.assumption}\n` : '';
+      const preconditionsText = scenario.preconditions && scenario.preconditions.length > 0 ? `\n\nPrecondiciones:\n${scenario.preconditions.map(p => `• ${p}`).join('\n')}` : '';
+      const testDataText = scenario.testData && scenario.testData.length > 0 ? `\n\nDatos de Prueba:\n${scenario.testData.map(d => `• ${d}`).join('\n')}` : '';
       const expectedResultText = scenario.expectedResult ? `\n\nResultado Esperado:\n${scenario.expectedResult}` : '';
-      const fullText = `Título: ${scenario.title}${assumptionText}\n\n${scenario.gherkin}\n\nCriterios de Aceptación:\n${criteriaText}${expectedResultText}`;
+      const fullText = `Título: ${scenario.title}${assumptionText}${preconditionsText}${testDataText}\n\n${scenario.gherkin}\n\nCriterios de Aceptación:\n${criteriaText}${expectedResultText}`;
       
       navigator.clipboard.writeText(fullText).then(() => {
         setIsCopied(true);
@@ -83,6 +87,44 @@ const ScenarioCard: React.FC<ScenarioCardProps> = ({
       )}
       
       <div className="p-4 space-y-4">
+        {scenario.preconditions && scenario.preconditions.length > 0 && (
+          <div>
+            <h4 className="flex items-center gap-2 text-sm font-bold uppercase tracking-wider text-slate-400 mb-3">
+              <ChecklistIcon className="w-4 h-4" />
+              Precondiciones
+            </h4>
+            <div className="bg-black/50 p-3 rounded-lg text-sm font-mono">
+              <ul className="space-y-1">
+                {scenario.preconditions.map((item, index) => (
+                  <li key={index} className="flex items-start gap-2">
+                    <span className="text-slate-500 mt-1">•</span>
+                    <span className="flex-1 text-slate-300 break-words">{item}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </div>
+        )}
+
+        {scenario.testData && scenario.testData.length > 0 && (
+          <div>
+            <h4 className="flex items-center gap-2 text-sm font-bold uppercase tracking-wider text-slate-400 mb-3">
+              <DatabaseIcon className="w-4 h-4" />
+              Datos de Prueba
+            </h4>
+            <div className="bg-black/50 p-3 rounded-lg text-sm font-mono">
+              <ul className="space-y-1">
+                {scenario.testData.map((item, index) => (
+                  <li key={index} className="flex items-start gap-2">
+                    <span className="text-slate-500 mt-1">•</span>
+                    <span className="flex-1 text-slate-300 break-words">{item}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </div>
+        )}
+
         <div>
           <h4 className="text-sm font-bold uppercase tracking-wider text-slate-400 mb-2">Escenarios Gherkin</h4>
           <pre className="bg-black/50 p-4 rounded-lg text-sm text-slate-300 font-mono whitespace-pre-wrap">

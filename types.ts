@@ -4,6 +4,8 @@ export interface RawScenario {
   acceptanceCriteria: string[];
   expectedResult?: string;
   assumption?: string;
+  preconditions?: string[];
+  testData?: string[];
 }
 
 export interface ScenarioResult {
@@ -13,6 +15,8 @@ export interface ScenarioResult {
   criteria: string[];
   expectedResult?: string;
   assumption?: string;
+  preconditions?: string[];
+  testData?: string[];
 }
 
 export interface ImageAttachment {

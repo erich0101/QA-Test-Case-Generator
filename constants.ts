@@ -16,6 +16,7 @@ No inventes ni asumas reglas de negocio; si algo es ambiguo, menciónalo en "ass
 Usa palabras clave en español en Gherkin: Dado, Cuando, Entonces, Y, Pero.
 Todos los criterios de aceptación deben ser objetivos, medibles y funcionales.
 Redactar un **resultado esperado** concreto y observable.
+**Opcionalmente**, si aplica, definir **precondiciones** y **datos de prueba**.
 Nunca devuelvas texto fuera del JSON.
 
 🧠 Criterios de análisis
@@ -37,6 +38,9 @@ Mensajes o feedback del sistema.
 Usa las imágenes asociadas (si se proveen) para inferir detalles visuales:
 Etiquetas, íconos, colores, disposición de campos, placeholders, etc.
 Si algo visual contradice el texto, prioriza el texto y documenta el conflicto en "assumption".
+Precondiciones y Datos de Prueba (Opcional): **IMPORTANTE:** Si un escenario requiere una configuración específica del sistema o datos concretos para ejecutarse, debes incluirlos en los campos \`preconditions\` y \`testData\`. Si no son necesarios, simplemente llenalos con ' '. En caso de falta de informacion indicar 'No se encontraron sufucuentes detalles en la historia de usuario para determinar esta informacion'
+Precondiciones (preconditions) ejemplo: Lista el estado o la configuración que el sistema debe tener *antes* de que comience la prueba. Debe ser un array de strings. Ejemplo: \`["El usuario debe estar autenticado con rol 'Administrador'."]\`
+Datos de Prueba (testData) ejemplo: Especifica los datos concretos que se deben utilizar *durante* la ejecución del escenario. Debe ser un array de strings. Ejemplo: \`["Usuario: 'test@example.com'"]\`
 
 ---
 
@@ -48,6 +52,12 @@ Si algo visual contradice el texto, prioriza el texto y documenta el conflicto e
 {
   "title": "Un título claro y conciso para el escenario.",
   "gherkin": "El escenario completo escrito en sintaxis Gherkin. USA PALABRAS CLAVE EN ESPAÑOL: Dado, Cuando, Entonces, Y, Pero.",
+  "preconditions": [
+    "El usuario debe estar autenticado con rol de 'Administrador'."
+  ],
+  "testData": [
+    "ID de pedido a buscar: 'ORD-12345'"
+  ],
   "acceptanceCriteria": [
     "Un criterio de aceptación claro y verificable.",
     "Otro criterio de aceptación."
@@ -62,14 +72,20 @@ Si algo visual contradice el texto, prioriza el texto y documenta el conflicto e
 \`\`\`json
 [
   {
-    "title": "Validación de campos requeridos en el formulario",
-    "gherkin": "Escenario: Validación de campos requeridos en el formulario\\n\\n  Dado que el usuario accede al formulario de Alta de Proveedor\\n  Y deja los campos 'Razón Social' y 'CUIT' vacíos\\n  Cuando presiona el botón 'Guardar'\\n  Entonces el sistema debe mostrar mensajes de error en los campos obligatorios.",
-    "acceptanceCriteria": [
-      "El sistema debe mostrar un mensaje de error específico en cada campo obligatorio vacío.",
-      "Los campos con error deben resaltarse visualmente (por ejemplo: borde rojo).",
-      "El botón 'Guardar' debe estar deshabilitado o la acción debe ser impedida mientras haya errores."
+    "title": "Un título claro y conciso para el escenario.",
+    "gherkin": "El escenario completo escrito en sintaxis Gherkin. USA PALABRAS CLAVE EN ESPAÑOL: Dado, Cuando, Entonces, Y, Pero.",
+    "preconditions": [
+      "El usuario debe estar autenticado con rol de 'Administrador'."
     ],
-    "expectedResult": "Debajo de los campos 'Razón Social' y 'CUIT' aparecen los textos de error 'Campo requerido' en color rojo. El formulario no se envía."
+    "testData": [
+      "ID de pedido a buscar: 'ORD-12345'"
+    ],
+    "acceptanceCriteria": [
+      "Un criterio de aceptación claro y verificable.",
+      "Otro criterio de aceptación."
+    ],
+    "expectedResult": "La evidencia observable y concreta. Ejemplo: 'La tabla se actualiza mostrando solo los pedidos dentro del rango de fechas. Un indicador muestra 'Filtros aplicados'. El botón 'Limpiar' se vuelve visible.'",
+    "assumption": "Se asumió que el sistema debe mostrar un único mensaje de error general en la parte superior del formulario, ya que no se especificó si los mensajes deben ser por campo."
   }
 ]
 \`\`\`

@@ -34,8 +34,10 @@ const ResultsDisplay: React.FC<ResultsDisplayProps> = ({
   const formatScenarioToText = (scenario: ScenarioResult): string => {
     const criteriaText = scenario.criteria.map(c => `• ${c}`).join('\n');
     const assumptionText = scenario.assumption ? `\nATENCIÓN - Suposición: ${scenario.assumption}\n` : '';
+    const preconditionsText = scenario.preconditions && scenario.preconditions.length > 0 ? `\n\nPrecondiciones:\n${scenario.preconditions.map(p => `• ${p}`).join('\n')}` : '';
+    const testDataText = scenario.testData && scenario.testData.length > 0 ? `\n\nDatos de Prueba:\n${scenario.testData.map(d => `• ${d}`).join('\n')}` : '';
     const expectedResultText = scenario.expectedResult ? `\n\nResultado Esperado:\n${scenario.expectedResult}` : '';
-    return `Título: ${scenario.title}${assumptionText}\n\n${scenario.gherkin}\n\nCriterios de Aceptación:\n${criteriaText}${expectedResultText}`;
+    return `Título: ${scenario.title}${assumptionText}\n${preconditionsText}${testDataText}\n\n${scenario.gherkin}\n\nCriterios de Aceptación:\n${criteriaText}${expectedResultText}`;
   };
 
   const handleCopyAll = () => {
@@ -71,12 +73,14 @@ const ResultsDisplay: React.FC<ResultsDisplayProps> = ({
           .replace(/Escenario: .*\n\n/i, '')
           .trim();
         const formattedCriteria = scenario.criteria.map(c => `• ${c}`).join('\n');
+        const formattedPreconditions = (scenario.preconditions || []).map(p => `• ${p}`).join('\n');
+        const formattedTestData = (scenario.testData || []).map(d => `• ${d}`).join('\n');
 
         return {
           'Suposición': scenario.assumption || '',
           'Escenario': scenario.title,
-          'Precondiciones': '',
-          'Datos de prueba': '',
+          'Precondiciones': formattedPreconditions,
+          'Datos de prueba': formattedTestData,
           'Pasos': formattedGherkin,
           'Criterios de aceptacion': formattedCriteria,
           'Resultado Esperado': scenario.expectedResult || '',

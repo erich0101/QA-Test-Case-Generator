@@ -147,6 +147,8 @@ function App() {
             criteria: scenario.acceptanceCriteria,
             expectedResult: scenario.expectedResult,
             assumption: scenario.assumption,
+            preconditions: scenario.preconditions,
+            testData: scenario.testData,
           })
         );
         setScenarios((prevScenarios) => [...prevScenarios, ...newScenarios]);

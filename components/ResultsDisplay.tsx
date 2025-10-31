@@ -75,6 +75,8 @@ const ResultsDisplay: React.FC<ResultsDisplayProps> = ({
         return {
           'Suposición': scenario.assumption || '',
           'Escenario': scenario.title,
+          'Precondiciones': '',
+          'Datos de prueba': '',
           'Pasos': formattedGherkin,
           'Criterios de aceptacion': formattedCriteria,
           'Resultado Esperado': scenario.expectedResult || '',
@@ -88,6 +90,8 @@ const ResultsDisplay: React.FC<ResultsDisplayProps> = ({
       worksheet['!cols'] = [
         { wch: 50 }, // Suposición
         { wch: 40 }, // Escenario
+        { wch: 50 }, // Precondiciones
+        { wch: 50 }, // Datos de prueba
         { wch: 60 }, // Pasos
         { wch: 60 }, // Criterios de aceptacion
         { wch: 60 }, // Resultado Esperado

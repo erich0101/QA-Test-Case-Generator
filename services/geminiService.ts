@@ -134,7 +134,7 @@ export async function analyzeUserStory(
             contents: { parts: contents },
             config: {
                 systemInstruction: USER_STORY_ANALYSIS_PROMPT,
-                temperature: 0.3,
+                temperature: 0.2,
             },
         });
 
@@ -182,7 +182,7 @@ export async function optimizeUserStory(
             contents: { parts: contents },
             config: {
                 systemInstruction: USER_STORY_OPTIMIZATION_PROMPT,
-                temperature: 0.4,
+                temperature: 0.3,
             },
         });
 

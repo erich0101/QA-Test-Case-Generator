@@ -1,4 +1,5 @@
 import React, { useState, useCallback, useEffect, useRef } from 'react';
+import { Analytics } from '@vercel/analytics/react';
 import { RawScenario, ScenarioResult, ImageAttachment, ApiScenario, ApiScenarioResult, E2EHistoryItem, ApiHistoryItem } from './types';
 import { generateScenarios, analyzeUserStory, optimizeUserStory } from './services/geminiService';
 import InputCard from './components/InputCard';
@@ -476,6 +477,7 @@ function App() {
         onClose={() => setShowCopyWarningModal(false)}
         onConfirm={handleConfirmCopy}
       />
+      <Analytics />
     </div>
   );
 }
